@@ -58,6 +58,6 @@ file for more details.
 
 ## Contributors ##
 + David Koslicki
-+Daniel Alonso Alemany
-+Daniel Falush
-+Nam Nguyen
++ Daniel Alonso Alemany
++ Daniel Falush
++ Nam Nguyen
