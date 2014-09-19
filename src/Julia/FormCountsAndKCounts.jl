@@ -20,7 +20,7 @@ function parse_commandline()
             help = "Kmer size"
         "--jellyfish_location", "-j"
             help = "Location of the Jellyfish binary"
-        "--jellyfish_threads, "-t"
+        "--jellyfish_threads", "-t"
             help = "Number of threads to run for jellyfish"
             default = 1
     end
