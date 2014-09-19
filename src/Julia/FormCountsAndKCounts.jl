@@ -108,7 +108,14 @@ function main()
 	@everywhere jellyfish_location = parsed_args["jellyfish_location"]
 
 	#Now do everything in parallel....
-	pmap(i->kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size), 1:length(file_names), err_retry=true, err_stop=false)
+    @sync begin
+    @parallel for i=1:length(file_names)
+        kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size);
+        gc()
+    end
+    end
+    
+	#pmap(i->kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size), 1:length(file_names), err_retry=true, err_stop=false)
 
 end
 
