@@ -10,10 +10,6 @@ There are two versions available, one written in Python and one in Julia. The Ju
 
 Both versions require the Kmer counting tool Jellyfish to be installed. Please see [the Jellyfish installation page](http://www.genome.umd.edu/jellyfish.html) for installation directions.
 
-#### Python version ####
-##### Running the Julia version #####
-To classify a sample using the Python version, use the command
-
 #### Julia version ####
 Please refer to [the Julia installation page](http://julialang.org/downloads/) to install Julia.
 You will need to add the HDF5 and ArgParse packages. These can be added using `Pkg.add("HDF5")` and `Pkg.add("ArgParse")`.
@@ -28,6 +24,22 @@ mkdir Counts20
 julia -p 10 FormCountsAndKCounts.jl -o ~/Counts20 -f ~/TrainingSequencesFileNames.txt -s ~/TrainingSequences/ -k 20 -j ~/jellyfish-2.1.1/bin/./jellyfish
 julia -p 45 FormCommonKmerMatrix.jl -c ~/Counts20 -k 20 -s 100 -f ~/TrainingSequencesFileNames.txt -o ~/CommonKmerMatrix-20mers.h5
 ```
+
+
+
+#### Python version ####
+##### Running the Python version #####
+
+##### Retraining the Python version #####
+Usual workflow:
+First split the Fasta files containing the training sequences (in this example: `./sequences/multiple-fasta-*.fa`) into Fasta files with exactly one sequence:
+`$ common-kmers.py split --prefix ./sequences/single-fasta_ ./sequences/multiple-fasta*`
+
+Then count the k-mers:
+`$ common-kmers.py count --kmer-length 7 --prefix ./counts/counts7_ ./sequences/single-fasta*`
+
+Finally, build the matrix with the common k-mers:
+`$ common-kmers.py common --output ./matrix7 ./counts/counts7_*'`
 
 ## Contact ##
 For issues with this software, contact david.koslicki@math.oregonstate.edu
