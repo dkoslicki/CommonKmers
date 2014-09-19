@@ -29,22 +29,6 @@ julia -p 10 FormCountsAndKCounts.jl -o ~/Counts20 -f ~/TrainingSequencesFileName
 julia -p 45 FormCommonKmerMatrix.jl -c ~/Counts20 -k 20 -s 100 -f ~/TrainingSequencesFileNames.txt -o ~/CommonKmerMatrix-20mers.h5
 ```
 
-
-
-
-
-Please read the directions on the [installation page](doc/install.markdown).
-
-
-## How Do I use Quikr? ##
-We have several ways to use quikr. Quikr is first and formost a command
-line utility, but we also provide python and matlab scripts.
-
-+ [Command Line Utilities](doc/cli.markdown)
-+ [Matlab documentation](doc/matlab.markdown)
-+ [Python documentation](doc/python.markdown)
-
-
 ## Contact ##
 For issues with this software, contact david.koslicki@math.oregonstate.edu
 
