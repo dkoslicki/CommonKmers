@@ -126,7 +126,7 @@ function main()
 	#Now form the kcounts in parallel
     @sync begin
         @parallel for i=1:length(file_names)
-            full_djf_name = string(output_dir,"/",file_names[i]-$(kmer_size)mers.djf)
+            full_djf_name = string(output_dir,"/","$(file_names[i])-$(kmer_size)mers.djf")
             kmer2kcount(full_djf_name, output_dir, file_names[i], kmer_size)
         end
     end
