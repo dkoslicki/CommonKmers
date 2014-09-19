@@ -72,7 +72,7 @@ end
 @everywhere function fasta2kmer(sequence_dir, sequence_file, kmer_size, jellyfish_location)
 	full_sequence_path = string(sequence_dir, "/", sequence_file);
 	#count the kmers, then dump them
-	kmers=readlines(`$(jellyfish_location) count $(full_sequence_path) -m $(kmer_size) -t 1 -s 100M -o /dev/fd/1 `  |> `$(jellyfish_location) dump /dev/fd/0 -c -t`);
+	kmers=readlines(`$(jellyfish_location) count $(full_sequence_path) -m $(kmer_size) -t 1 -s 100M -C -o /dev/fd/1 `  |> `$(jellyfish_location) dump /dev/fd/0 -c -t`);
 	return kmers
 end
 
