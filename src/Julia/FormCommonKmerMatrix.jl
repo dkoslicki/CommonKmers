@@ -93,7 +93,7 @@ function main()
 				@sync begin
 				@parallel for ii = i:i+chunk_size-1
 					if ii<=num_seqs
-						iKmers = HDF5.h5read(string(counts_dir,"$(file_names[ii])-$(kmer_size)mers.kcount"),"/kmers");
+						iKmers = HDF5.h5read(string(counts_dir,"/","$(file_names[ii])-$(kmer_size)mers.kcount"),"/kmers");
 						for jj=j:j+chunk_size-1
 							if jj<=num_seqs
 								jKmers = HDF5.h5read(string(counts_dir,"$(file_names[jj])-$(kmer_size)mers.kcount"),"/kmers");
