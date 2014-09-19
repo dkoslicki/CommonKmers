@@ -8,6 +8,8 @@ CommonKmers is a k-mer based bacterial community reconstruction technique that u
 ## How Do I Install CommonKmers? ##
 There are two versions available, one written in Python and one in Julia. The Julia version is nearly two orders of magnitude faster than the python version.
 
+Both versions require the Kmer counting tool Jellyfish to be installed. Please see [the Jellyfish installation page](http://www.genome.umd.edu/jellyfish.html) for installation directions.
+
 #### Python version ####
 ##### Running the Julia version #####
 To classify a sample using the Python version, use the command
@@ -20,11 +22,11 @@ You will need to add the HDF5 and ArgParse packages. These can be added using `P
 To classify a sample using the Julia version, use the commands
 
 ##### Retraining the Julia version #####
-To train on a custom database, use the functions ` FormCountsAndKCounts.jl` and `FormCommonKmerMatrix.jl`. For example, say the directory `~/TrainingSequences` contains your training sequences, and the file `TrainingSequencesFileNames.txt` contains the file names of these sequences. Then you can train the method by using:
+To train on a custom database, use the functions ` FormCountsAndKCounts.jl` and `FormCommonKmerMatrix.jl`. For example, say the directory `~/TrainingSequences` contains your training sequences, the file `~/TrainingSequencesFileNames.txt` contains the file names of these sequences, and the Jellyfish binary is located in `~/jellyfish-2.1.1/bin/`. Then you can retrain the method by using:
 ```
 mkdir Counts20
-julia -p 10 FormCountsAndKCounts.jl -o ~/ -f Test/testFileNames.txt -s ../microbes/ -k 21 -j /home/pi/koslickd/jellyfish-2.1.1/bin/./jellyfish
-
+julia -p 10 FormCountsAndKCounts.jl -o ~/Counts20 -f ~/TrainingSequencesFileNames.txt -s ~/TrainingSequences/ -k 20 -j ~/jellyfish-2.1.1/bin/./jellyfish
+julia -p 45 FormCommonKmerMatrix.jl -c ~/Counts20 -k 20 -s 100 -f ~/TrainingSequencesFileNames.txt -o ~/CommonKmerMatrix-20mers.h5
 ```
 
 
