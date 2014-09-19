@@ -96,7 +96,7 @@ function main()
 						iKmers = HDF5.h5read(string(counts_dir,"/","$(file_names[ii])-$(kmer_size)mers.kcount"),"/kmers");
 						for jj=j:j+chunk_size-1
 							if jj<=num_seqs
-								jKmers = HDF5.h5read(string(counts_dir,"$(file_names[jj])-$(kmer_size)mers.kcount"),"/kmers");
+								jKmers = HDF5.h5read(string(counts_dir,"/","$(file_names[jj])-$(kmer_size)mers.kcount"),"/kmers");
 								(CommonKmersMatrix[ii,jj],CommonKmersMatrix[jj,ii]) = countPair(iKmers,jKmers);
 							end
 						end
