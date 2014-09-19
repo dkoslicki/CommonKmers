@@ -112,7 +112,7 @@ function main()
 	@everywhere jellyfish_location = parsed_args["jellyfish_location"]
     
     #Count all the kmers using jellyfish
-    run(`cat $(file_names_path)` |> `xargs -P 40 -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t 1 -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
+    run(`cat $(file_names_path)` |> `xargs -P 0 -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t 1 -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
     
     #Dump all the jellyfish files
     run(`cat $(file_names_path)` |> `xargs -P 10 -I{} $(jellyfish_location) dump $(string(output_dir,"/")){}-$(kmer_size)mers.jf -c -t -o $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
@@ -123,16 +123,16 @@ function main()
     #Form the kcounts
 
 
-	#Now do everything in parallel....
+	#Now form the kcounts in parallel
     @sync begin
         @parallel for i=1:length(file_names)
             full_djf_name = string(output_dir,"/",file_names[i]-$(kmer_size)mers.djf)
             kmer2kcount(full_djf_name, output_dir, file_names[i], kmer_size)
         end
     end
-
-
-#	pmap(i->kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size), 1:length(file_names), err_retry=true, err_stop=false)
+    
+    #Now delete the djf files
+    run(`cat $(file_names_path)` |> `xargs -I{} rm {} $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
 
 end
 
