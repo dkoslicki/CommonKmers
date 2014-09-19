@@ -118,7 +118,7 @@ function main()
     run(`cat $(file_names_path)` |> `xargs -P 10 -I{} $(jellyfish_location) dump $(string(output_dir,"/")){}-$(kmer_size)mers.jf -c -t -o $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
     
     #Delete the *.jf files
-    run(`cat $(file_names_path)` |> `xargs -I{} rm {} $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
+    run(`cat $(file_names_path)` |> `xargs -I{} rm $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
     
     #Form the kcounts
 
@@ -132,7 +132,7 @@ function main()
     end
     
     #Now delete the djf files
-    run(`cat $(file_names_path)` |> `xargs -I{} rm {} $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
+    run(`cat $(file_names_path)` |> `xargs -I{} rm $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
 
 end
 
