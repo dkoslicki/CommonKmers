@@ -46,11 +46,11 @@ line utility, but we also provide python and matlab scripts.
 
 
 ## Contact ##
-For issues with the quikr software, contact gailro@gmail.com
+For issues with this software, contact david.koslicki@math.oregonstate.edu
 
 
 ## License ##
-The Quikr project is released under the GPL-3 License. Please view the [LICENSE](LICENSE)
+This project is released under the GPL-3 License. Please view the [LICENSE](LICENSE)
 file for more details.
 
 
