@@ -65,6 +65,7 @@ end
 	write(fid,"total_count",total)
 	write(fid,"kmer_size",kmer_size)
 	close(fid)
+    gc()
 end
 
 
