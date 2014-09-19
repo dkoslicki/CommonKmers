@@ -101,21 +101,29 @@ function main()
 	#Use the command line arguments to populate variables
 	@everywhere output_dir = parsed_args["output_dir"]
 	@everywhere kmer_size = int(parsed_args["kmer_size"])
+    file_names_path = parsed_args["file_names"]
 	@everywhere fid = open(parsed_args["file_names"],"r")
 	@everywhere file_names = split(readall(fid))
 	@everywhere close(fid)
 	@everywhere sequence_dir = parsed_args["sequence_dir"]
 	@everywhere jellyfish_location = parsed_args["jellyfish_location"]
+    
+    #Count all the kmers using jellyfish
+    run(`cat $(file_names_path)` |> `xargs -P 40 -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t 1 -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
+    
+    #Dump all the jellyfish files
+    run(`cat $(file_names_path)` |> `xargs -P 10 -I{} $(jellyfish_location) dump $(string(output_dir,"/")){}-$(kmer_size)mers.jf -c -t -o $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
+
 
 	#Now do everything in parallel....
-    @sync begin
-    @parallel for i=1:length(file_names)
-        kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size);
-        gc()
-    end
-    end
-    
-	#pmap(i->kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size), 1:length(file_names), err_retry=true, err_stop=false)
+#    @sync begin
+#    @parallel for i=1:length(file_names)
+#        kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size);
+#        gc()
+#    end
+#    end
+
+#	pmap(i->kmer2kcount(fasta2kmer(sequence_dir, file_names[i], kmer_size, jellyfish_location), output_dir, file_names[i], kmer_size), 1:length(file_names), err_retry=true, err_stop=false)
 
 end
 
