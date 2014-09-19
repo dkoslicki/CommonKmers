@@ -33,13 +33,13 @@ julia -p 45 FormCommonKmerMatrix.jl -c ~/Counts20 -k 20 -s 100 -f ~/TrainingSequ
 ##### Retraining the Python version #####
 Usual workflow:
 First split the Fasta files containing the training sequences (in this example: `./sequences/multiple-fasta-*.fa`) into Fasta files with exactly one sequence:
-`$ common-kmers.py split --prefix ./sequences/single-fasta_ ./sequences/multiple-fasta*`
+```$ common-kmers.py split --prefix ./sequences/single-fasta_ ./sequences/multiple-fasta*```
 
 Then count the k-mers:
-`$ common-kmers.py count --kmer-length 7 --prefix ./counts/counts7_ ./sequences/single-fasta*`
+```$ common-kmers.py count --kmer-length 7 --prefix ./counts/counts7_ ./sequences/single-fasta*```
 
 Finally, build the matrix with the common k-mers:
-`$ common-kmers.py common --output ./matrix7 ./counts/counts7_*'`
+```$ common-kmers.py common --output ./matrix7 ./counts/counts7_*'```
 
 ## Contact ##
 For issues with this software, contact david.koslicki@math.oregonstate.edu
