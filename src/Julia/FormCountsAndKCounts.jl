@@ -11,15 +11,18 @@ function parse_commandline()
 
     @add_arg_table s begin
         "--output_dir", "-o"
-		help = "Path to the directory that will contain the *.kcount files"
+            help = "Path to the directory that will contain the *.kcount files"
         "--file_names", "-f"
-		help = "Text file of file name prefixes: '\$(file_names[i])-\$(kmer_size)mers.kcount'"
+            help = "Text file of file name prefixes: '\$(file_names[i])-\$(kmer_size)mers.kcount'"
         "--sequence_dir", "-s"
-		help = "Path to the individual FASTA sequence files"
+            help = "Path to the individual FASTA sequence files"
         "--kmer_size", "-k"
-		help = "Kmer size"
-	"--jellyfish_location", "-j"
-		help = "Location of the Jellyfish binary"
+            help = "Kmer size"
+        "--jellyfish_location", "-j"
+            help = "Location of the Jellyfish binary"
+        "--jellyfish_threads, "-t"
+            help = "Number of threads to run for jellyfish"
+            default = 1
     end
     return parse_args(s)
 end
@@ -102,6 +105,7 @@ function main()
 	    error("kmer_size must be provided, use --help to see usage")
 	end
 	#Use the command line arguments to populate variables
+    @everywhere jellyfish_threads = parsed_args["jellyfish_threads"]
 	@everywhere output_dir = parsed_args["output_dir"]
 	@everywhere kmer_size = int(parsed_args["kmer_size"])
     file_names_path = parsed_args["file_names"]
@@ -112,7 +116,7 @@ function main()
 	@everywhere jellyfish_location = parsed_args["jellyfish_location"]
     
     #Count all the kmers using jellyfish
-    run(`cat $(file_names_path)` |> `xargs -P 0 -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t 1 -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
+    run(`cat $(file_names_path)` |> `xargs -P 0 -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t $(jellyfish_threads) -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
     
     #Dump all the jellyfish files
     run(`cat $(file_names_path)` |> `xargs -P 10 -I{} $(jellyfish_location) dump $(string(output_dir,"/")){}-$(kmer_size)mers.jf -c -t -o $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
