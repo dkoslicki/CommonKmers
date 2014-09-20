@@ -22,7 +22,7 @@ function parse_commandline()
 			default = 1
         "--output_taxonomic_rank", "-r"
 			help = "Output taxonomic rank, either an integer: 1, or a range [1:2]"
-			default = [1:8]
+			default = "[1:8]"
 		"--output_file", "-o"
 			help = "Output text file"
 		"--sample_ID", "-I"
