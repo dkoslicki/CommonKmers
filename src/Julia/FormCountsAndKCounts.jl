@@ -121,6 +121,7 @@ function main()
     
     #Count all the kmers using jellyfish
     run(`cat $(file_names_path)` |> `xargs -P $(xargs_threads) -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t $(jellyfish_threads) -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
+    gc()
     
     #Dump all the jellyfish files
     run(`cat $(file_names_path)` |> `xargs -P 10 -I{} $(jellyfish_location) dump $(string(output_dir,"/")){}-$(kmer_size)mers.jf -c -t -o $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
