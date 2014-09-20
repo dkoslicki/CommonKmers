@@ -23,6 +23,9 @@ function parse_commandline()
         "--jellyfish_threads", "-t"
             help = "Number of threads to run for jellyfish"
             default = 1
+        "--xargs_threads", "-x"
+            help = "Number of xargs threads to use"
+            default = 10
     end
     return parse_args(s)
 end
@@ -105,6 +108,7 @@ function main()
 	    error("kmer_size must be provided, use --help to see usage")
 	end
 	#Use the command line arguments to populate variables
+    @everywhere xargs_threads = parsed_args["xargs_threads"]
     @everywhere jellyfish_threads = parsed_args["jellyfish_threads"]
 	@everywhere output_dir = parsed_args["output_dir"]
 	@everywhere kmer_size = int(parsed_args["kmer_size"])
@@ -116,7 +120,7 @@ function main()
 	@everywhere jellyfish_location = parsed_args["jellyfish_location"]
     
     #Count all the kmers using jellyfish
-    run(`cat $(file_names_path)` |> `xargs -P 30 -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t $(jellyfish_threads) -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
+    run(`cat $(file_names_path)` |> `xargs -P $(xargs_threads) -I{} $(jellyfish_location) count $(string(sequence_dir,"/")){} -m $(kmer_size) -t $(jellyfish_threads) -s 100M -C -o $(string(output_dir,"/")){}-$(kmer_size)mers.jf`)
     
     #Dump all the jellyfish files
     run(`cat $(file_names_path)` |> `xargs -P 10 -I{} $(jellyfish_location) dump $(string(output_dir,"/")){}-$(kmer_size)mers.jf -c -t -o $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
