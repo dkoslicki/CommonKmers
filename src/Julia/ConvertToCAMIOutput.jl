@@ -63,8 +63,8 @@ indicies_of_interest = range((output_level-1) * num_organisms, output_level * nu
 
 #First, select the portion of the taxonomy that has a nonzero entry in the reconstruction
 cutoff = .00001
-support = indicies_of_interest[find(input[indicies_of_interest] .> cutoff)]
-nonzero_taxonomy = taxonomy[(support % num_organisms).+1]
+support = indicies_of_interest[find(input[indicies_of_interest] .> cutoff)] #Support in the indicies of interest
+nonzero_taxonomy = taxonomy[(support - (num_organisms*(output_level-1)))] #Shift everything left to the start since taxonomy has only num_organisms length
 
 #open the output file
 output_file_handle = open(output_file,"w")
