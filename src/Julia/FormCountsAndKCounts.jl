@@ -75,7 +75,7 @@ end
 end
 
 
-#This will form the jellyfish file, then dump it, then return just the kmers and counts themselves
+#This is faster, but used a bazzillion file descriptors
 #@everywhere function fasta2kmer(sequence_dir, sequence_file, kmer_size, jellyfish_location)
 #	full_sequence_path = string(sequence_dir, "/", sequence_file);
 #	#count the kmers, then dump them

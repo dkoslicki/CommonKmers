@@ -12,12 +12,12 @@ function parse_commandline()
 		help = "Path to the directory that will contain the *.kcount files"
         "--file_names", "-f"
 		help = "Text file of file name prefixes: '\$(file_names[i])-\$(kmer_size)mers.kcount'"
-	"--output_file", "-o"
-		help = "Output file"
-	"--level_of_compression", "-l"
-		help = "Compression level 0-9"
-	"--kmer_size", "-k"
-		help = "kmer size"
+        "--output_file", "-o"
+            help = "Output file"
+        "--level_of_compression", "-l"
+            help = "Compression level 0-9"
+        "--kmer_size", "-k"
+            help = "kmer size"
     end
     return parse_args(s)
 end
