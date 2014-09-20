@@ -25,7 +25,7 @@ function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
 	
 	# Outer loop to put variables into set to hold positive coefficients
 	while any(Z) & any(w[Z[:]] .> tol)
-		print("On iteration $(outeriter)\n")
+		#print("On iteration $(outeriter)\n")
 
 		outeriter = outeriter + 1;
 		
