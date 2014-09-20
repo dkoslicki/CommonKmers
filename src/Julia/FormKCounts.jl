@@ -1,6 +1,8 @@
 #!/usr/local/julia/usr/bin/julia
 #Example usage 
 #julia -p 3 FormKCounts.jl -o Test/ -f Test/testFileNames.txt -k 21
+#Make sure you first form the Kcounts via something like
+#cat $InputFile | xargs -P 20 -I{} sh -c "/home/pi/koslickd/jellyfish-2.1.1/bin/./jellyfish count $OutputDir/microbes/{} -m 30 -t 1 -s 100M -C -o /dev/fd/1 | /home/pi/koslickd/jellyfish-2.1.1/bin/./jellyfish dump /dev/fd/0 -c -t > $OutputDir/Counts/Counts30C/{}-30mers.djf"
 
 using ArgParse
 using HDF5
