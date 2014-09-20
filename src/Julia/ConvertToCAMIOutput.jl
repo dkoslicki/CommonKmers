@@ -2,7 +2,8 @@
 
 ###########################
 #To Do
-#Make sure that the abundances at each taxonomic rank sum to <=1
+#1. Make sure that the abundances at each taxonomic rank sum to <=1
+#2. Get it fully in the CAMI format (with TaxID's and ranks and TaxPath) see https://github.com/CAMI-challenge/contest_information/blob/master/file_formats/Example_TaxProfiling_Outputfile.txt
 ############################
 
 using ArgParse
@@ -24,6 +25,12 @@ function parse_commandline()
 			default = [1:8]
 		"--output_file", "-o"
 			help = "Output text file"
+		"--sample_ID", "-I"
+			help = "Sample ID"
+			default = "SAMPLEID"
+		"--contestant_ID", "-C"
+			help = "Contestant ID"
+			default = "CONTESTANTID"
     end
     return parse_args(s)
 end
@@ -35,6 +42,8 @@ taxonomy_file = parsed_args["taxonomy_file"]
 output_level = int(parsed_args["output_level"])
 output_taxonomic_rank = eval(parse(parsed_args["output_taxonomic_rank"]))
 output_file = parsed_args["output_file"]
+sample_ID = parsed_args["sample_ID"]
+contestant_ID = parsed_args["contestant_ID"]
 
 #Read in the input file
 fid = open(input_file,"r")
@@ -59,6 +68,14 @@ nonzero_taxonomy = taxonomy[(support % num_organisms).+1]
 
 #open the output file
 output_file_handle = open(output_file,"w")
+
+#Write the header
+write(output_file_handle,"# CAMI Submission for Taxonomic Profiling\n")
+write(output_file_handle, "@Task:Profiling\n")
+write(output_file_handle,"@Version:1.0\n")
+write(output_file_handle,"@ContestantID:CONTESTANTID\n")
+write(output_file_handle,"@SampleID:$(sample_ID)\n")
+write(output_file_handle,"@Ranks: superkingdom|phylum|class|order|family|genus|species|strain\n")
 
 #Now for each of the ranks, get the unique names, then loop over the non-zero taxonomy, increasing the value of the unique taxa name, then output these to the file
 if typeof(output_taxonomic_rank) == Int64
