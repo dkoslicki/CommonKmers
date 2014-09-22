@@ -1,19 +1,9 @@
 #!/usr/local/julia/usr/bin/julia
 
-#julia FormY.jl kmer_size num_seqs sample.kcount database_counts_dir outifle.h5
-#julia FormY.jl 20 100 /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingDanielsCodeMergedChromosomesNewDB/TestY/counts_prefix0.kcount /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingDanielsCodeMergedChromosomesNewDB/counts20 /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingDanielsCodeMergedChromosomesNewDB/TestY/SRR172902-filtered.fasta-20mers-Y.h5
-#Form the sample .kcounts by using ./form_kcount.py count -k 20 -t 1 -j 40 -s 100M -b ./jellyfish --prefix ./TestY/counts_prefix ./TestY/SRR172902-filtered.fasta
-#nohup /usr/local/julia/usr/bin/julia FormY.jl 20 2605 /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingDanielsCodeMergedChromosomesNewDB/TestY/counts_prefix0.kcount /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingDanielsCodeMergedChromosomesNewDB/counts20 /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingDanielsCodeMergedChromosomesNewDB/TestY/SRR172902-filtered.fasta-20mers-Y.h5 & 
-
-
-#!/usr/local/julia/usr/bin/julia
-#Example usage 
-#julia -p 3 FormCountsAndKCounts.jl -o Test/ -f Test/testFileNames.txt -s ../microbes/ -k 21 -j /home/pi/koslickd/jellyfish-2.1.1/bin/./jellyfish
-
 using ArgParse
 using HDF5
 
-#Parse arguments
+#Parse arguments function
 function parse_commandline()
     s = ArgParseSettings()
 
@@ -23,7 +13,7 @@ function parse_commandline()
         "--file_names", "-f"
 			help = "Text file of training file name prefixes: '\$(file_names[i])-\$(kmer_size)mers.kcount'"
         "--counts_HDF5_file", "-c"
-			help = "Location of Kcounts in one big HDF5 file"
+			help = "Location of Kcounts in one big HDF5 file, datasets in the form '\$(file_names[i])-\$(kmer_size)mers.kcount'"
 		"--input_file", "-i"
 			help = "File name of sample kcount file"
         "--kmer_size", "-k"
