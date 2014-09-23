@@ -1,4 +1,4 @@
-#!/usr/local/julia/usr/bin/julia
+
 #Example usage
 #julia -p 2 FormCommonKmerMatrix.jl --counts_dir /raid2/labs/Koslicki_lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Counts/Counts20C/ --size_of_chunk 2 --file_names testFileNames.txt  -o test_out.h5 -k 20
 

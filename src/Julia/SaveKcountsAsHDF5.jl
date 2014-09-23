@@ -1,4 +1,4 @@
-#!/usr/local/julia/usr/bin/julia
+
 
 using ArgParse
 using HDF5

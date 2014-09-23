@@ -1,4 +1,4 @@
-#!/usr/local/julia/usr/bin/julia
+
 #Example usage 
 #julia -p 3 FormKCounts.jl -o Test/ -f Test/testFileNames.txt -k 21
 #Make sure you first form the Kcounts via something like
@@ -20,6 +20,11 @@ function parse_commandline()
             help = "Kmer size"
     end
     return parse_args(s)
+end
+
+#This is for kmer sizes >32
+@everywhere function encodeLarge(kmer)
+	return int64(hash(kmer))
 end
 
 #encode a kmer to an Int64, using 2 bits per character
@@ -54,7 +59,11 @@ end
 	kmer_words=Array(ASCIIString,length(all_lines));
 	kmer_words = [all_lines_split[i][1] for i=1:length(all_lines)];
 	counts = [all_lines_split[i][2] for i=1:length(all_lines)];
-	kmers_to_write[1,:] = map(encode,kmer_words);
+	if kmer_size > 32
+		kmers_to_write[1,:] = map(encodeLarge,kmer_words);
+	else
+		kmers_to_write[1,:] = map(encode,kmer_words);
+	end
 	kmers_to_write[2,:] = map(int, counts);
 	total = sum(kmers_to_write[2,:]);
 	kmers_to_write = sortcols(kmers_to_write,alg=QuickSort) #takes about a minute...QuickSort is the fastest
@@ -99,6 +108,9 @@ function main()
 	#Use the command line arguments to populate variables
 	@everywhere output_dir = parsed_args["output_dir"]
 	@everywhere kmer_size = int(parsed_args["kmer_size"])
+    if kmer_size > 32
+		write(STDOUT, "kmer_size > 32, using hash to encode kmer\n")
+	end
     file_names_path = parsed_args["file_names"]
 	@everywhere fid = open(parsed_args["file_names"],"r")
 	@everywhere file_names = split(readall(fid))
