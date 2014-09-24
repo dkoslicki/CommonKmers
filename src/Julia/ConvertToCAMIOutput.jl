@@ -1,10 +1,11 @@
-
-
-###########################
-#To Do
-#1. Make sure that the abundances at each taxonomic rank sum to <=1
-#2. Get it fully in the CAMI format (with TaxID's and ranks and TaxPath) see https://github.com/CAMI-challenge/contest_information/blob/master/file_formats/Example_TaxProfiling_Outputfile.txt
-############################
+# ==============================================================================
+# Evaluate.jl
+#
+# Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
+#
+# Takes a raw reconstruction vector (flat text file of floats on the same basis
+# as the given taxonomy file) and outputs the classification in the CAMI format.
+# ==============================================================================
 
 using ArgParse
 
