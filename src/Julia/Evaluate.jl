@@ -172,19 +172,11 @@ for rank in unique_rank_names
 	L2sum = 0.
 	#Currently this is very lazily (=inefficiently) done. What I should is pre-split the three cases, then do the sum. Whatever, this is fast enough
 	for taxID = all_taxIDs
-		in_gt = in(taxID, gt_rank_taxIDs)
-		in_input = in(taxID, input_rank_taxIDs)
-		if in_gt & in_input
 			#note that taxID's might repeat in gt_rank_taxIDs due to missing organism, so sum up all of these before taking the difference
-			L1sum = L1sum + abs(sum(gt_rank_freqs[findin(gt_rank_taxIDs,taxID)]) - sum(input_rank_freqs[findin(input_rank_taxIDs,taxID)]))
-			L2sum = L2sum + abs(sum(gt_rank_freqs[findin(gt_rank_taxIDs,taxID)]) - sum(input_rank_freqs[findin(input_rank_taxIDs,taxID)])).^2
-		elseif in_gt & ~in_input
-			L1sum = L1sum + sum(gt_rank_freqs[findin(gt_rank_taxIDs,taxID)])
-			L2sum = L2sum + sum(gt_rank_freqs[findin(gt_rank_taxIDs,taxID)]).^2
-		elseif ~in_gt & in_input
-			L1sum = L1sum + sum(input_rank_freqs[findin(input_rank_taxIDs,taxID)])
-			L2sum = L2sum + sum(input_rank_freqs[findin(input_rank_taxIDs,taxID)]).^2
-		end
+			gt_sum = sum(gt_rank_freqs[findin(gt_rank_taxIDs,taxID)])
+			input_sum = sum(input_rank_freqs[findin(input_rank_taxIDs,taxID)])
+			L1sum = L1sum + abs(gt_sum - input_sum)
+			L2sum = L2sum + abs(gt_sum - input_sum).^2
 	end
 	L1norm = L1sum
 	L2norm = sqrt(L1sum)
@@ -207,7 +199,3 @@ write(fid, "L1 norm\t $(join(L1norms,"|"))\n")
 write(fid, "L2 norm\t $(join(L2norms,"|"))\n")
 
 close(fid)
-		
-		
-		
-		
