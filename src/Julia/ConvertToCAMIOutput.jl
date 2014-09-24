@@ -83,7 +83,7 @@ if typeof(output_taxonomic_rank) == Int64
 elseif typeof(output_taxonomic_rank) == Array{Int64,1}
 	taxa_rank_list = output_taxonomic_rank
 else
-	error("Input taxonomic rank should be an integer, or else dont include the option to output all ranks")
+	error("Input taxonomic rank should be an integer, or else don't include the option to output all ranks")
 end
 
 for taxa_rank = taxa_rank_list	
@@ -95,7 +95,8 @@ for taxa_rank = taxa_rank_list
 			append!(taxa_names, {taxa_name})
 		end
 	end
-	unique_taxa_names = sort(unique(taxa_names));
+	unique_taxa_names = sort(unique(taxa_names)); #This assumes that there's a bijection between taxa names and tax IDs
+
 	#Now loop through each of the non_zero taxonomies, see if the taxa name matches, and then add this to the abundances
 	taxa_abundances = Dict();
 	for unique_taxa_name = unique_taxa_names
@@ -111,7 +112,39 @@ for taxa_rank = taxa_rank_list
 		nonzero_taxonomy_counter = nonzero_taxonomy_counter + 1
 	end
 	for unique_taxa_name = unique_taxa_names
-		write(output_file_handle, "$(unique_taxa_name)")
+		taxID = split(split(unique_taxa_name,"|")[end],"_")[3];
+		write(output_file_handle, "$(taxID)")
+		write(output_file_handle, "\t")
+		
+		rankAbvr = split(split(unique_taxa_name,"|")[end],"_")[1];
+		if rankAbvr == "k"
+			rank = "kingdom"
+		elseif rankAbvr == "p"
+			rank = "phylum"
+		elseif rankAbvr == "c"
+			rank = "class"
+		elseif rankAbvr == "o"
+			rank = "order"
+		elseif rankAbvr == "f"
+			rank = "family"
+		elseif rankAbvr == "g"
+			rank = "genus"
+		elseif rankAbvr == "s"
+			rank = "species"
+		elseif rankAbvr == "t"
+			rank = "string"
+		else
+			rank = "unknown"
+		end
+		write(output_file_handle, "$(rank)")
+		write(output_file_handle, "\t")
+		
+		taxPath = join(map(x->split(x,"_")[3],split(unique_taxa_name,"|")),"|");
+		write(output_file_handle, "$(taxPath)")
+		write(output_file_handle, "\t")
+		
+		taxPathSN = join(map(x->join(split(x,"_")[4:end],"_"),split(unique_taxa_name,"|")),"|");
+		write(output_file_handle, "$(taxPathSN)")
 		write(output_file_handle, "\t")
 		write(output_file_handle, "$(taxa_abundances[unique_taxa_name])")
 		write(output_file_handle, "\n")
