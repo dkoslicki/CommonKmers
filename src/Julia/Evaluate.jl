@@ -106,9 +106,9 @@ unique_rank_names = unique(vcat(gt_ranks,input_ranks))
 
 #open output file
 fid = open(output_file,"w")
-write(fid, "@input: $(basename(input_file))\n")
-write(fid, "@ground_truth: $(basename(ground_truth))\n")
-write(fid, "@Taxanomic ranks: $(join(unique_rank_names,"|"))\n")
+write(fid, "@input\t $(basename(input_file))\n")
+write(fid, "@ground_truth\t $(basename(ground_truth))\n")
+write(fid, "@Taxanomic ranks\t $(join(unique_rank_names,"|"))\n")
 
 Precs = zeros(length(unique_rank_names))
 Senss = zeros(length(unique_rank_names))
