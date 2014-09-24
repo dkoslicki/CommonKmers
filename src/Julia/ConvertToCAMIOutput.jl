@@ -92,7 +92,7 @@ for taxa_rank = taxa_rank_list
 	taxa_names = cell(0);
 	for taxonomy_string = nonzero_taxonomy
 		nonzero_taxonomy_split = split(taxonomy_string,"|")
-		if length(nonzero_taxonomy_split) > taxa_rank
+		if length(nonzero_taxonomy_split) >= taxa_rank
 			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
 			append!(taxa_names, {taxa_name})
 		end
@@ -107,7 +107,7 @@ for taxa_rank = taxa_rank_list
 	nonzero_taxonomy_counter = 1
 	for taxonomy_string = nonzero_taxonomy
 		nonzero_taxonomy_split = split(taxonomy_string,"|")
-		if length(nonzero_taxonomy_split) > taxa_rank
+		if length(nonzero_taxonomy_split) >= taxa_rank
 			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
 			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input[support[nonzero_taxonomy_counter]]
 		end
