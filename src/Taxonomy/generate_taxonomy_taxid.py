@@ -1,4 +1,5 @@
 #!/local/cluster/bin/python2.7
+# !/usr/bin/env python
 
 # ==============================================================================
 # generate_taxonomy.py
