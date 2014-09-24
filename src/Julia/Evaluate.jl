@@ -1,3 +1,12 @@
+# ==============================================================================
+# Evaluate.jl
+#
+# Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
+#
+# Creates a file of error that outputs various error metrics at various taxonomic
+# ranks for a test file and a "ground truth" file.
+# ==============================================================================
+
 using ArgParse
 
 #Parse arguments
