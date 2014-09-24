@@ -141,7 +141,7 @@ for taxa_rank = taxa_rank_list
 		write(output_file_handle, "$(rank)")
 		write(output_file_handle, "\t")
 		
-		taxPath = map(x->split(x,"_")[3],split(unique_taxa_name,"|")),"|"); #Tax ID's
+		taxPath = map(x->split(x,"_")[3],split(unique_taxa_name,"|")); #Tax ID's
 		taxPathSN = map(x->join(split(x,"_")[4:end],"_"),split(unique_taxa_name,"|")); #Taxa names
 		
 		#If a Tax ID is repeated at a lower taxonomic rank, this means that that rank is missing, so let's just delete it.
@@ -153,6 +153,9 @@ for taxa_rank = taxa_rank_list
 				end
 			end
 		end
+		#Join back up the paths
+		taxPath = join(taxPath,"|")
+		taxPathSN = join(taxPathSN,"|")
 		
 		write(output_file_handle, "$(taxPath)")
 		write(output_file_handle, "\t")
