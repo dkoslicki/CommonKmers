@@ -120,7 +120,7 @@ for taxa_rank = taxa_rank_list
 		
 		rankAbvr = split(split(unique_taxa_name,"|")[end],"_")[1];
 		if rankAbvr == "k"
-			rank = "kingdom"
+			rank = "superkingdom"
 		elseif rankAbvr == "p"
 			rank = "phylum"
 		elseif rankAbvr == "c"
