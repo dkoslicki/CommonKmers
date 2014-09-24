@@ -76,6 +76,8 @@ write(output_file_handle,"@Version:1.0\n")
 write(output_file_handle,"@ContestantID:CONTESTANTID\n")
 write(output_file_handle,"@SampleID:$(sample_ID)\n")
 write(output_file_handle,"@Ranks: superkingdom|phylum|class|order|family|genus|species|strain\n")
+write(output_file_handle,"\n")
+write(output_file_handle,"@@TAXID\tRANK\tTAXPATH\tTAXPATH_SN\tPERCENTAGE\n")
 
 #Now for each of the ranks, get the unique names, then loop over the non-zero taxonomy, increasing the value of the unique taxa name, then output these to the file
 if typeof(output_taxonomic_rank) == Int64
@@ -139,11 +141,23 @@ for taxa_rank = taxa_rank_list
 		write(output_file_handle, "$(rank)")
 		write(output_file_handle, "\t")
 		
-		taxPath = join(map(x->split(x,"_")[3],split(unique_taxa_name,"|")),"|");
+		taxPath = map(x->split(x,"_")[3],split(unique_taxa_name,"|")),"|"); #Tax ID's
+		taxPathSN = map(x->join(split(x,"_")[4:end],"_"),split(unique_taxa_name,"|")); #Taxa names
+		
+		#If a Tax ID is repeated at a lower taxonomic rank, this means that that rank is missing, so let's just delete it.
+		for i=1:length(taxPath)
+			if i>=2
+				if taxPath[i] == taxPath[i-1]
+					taxPath[i] = ""
+					taxPathSN[i] = ""
+				end
+			end
+		end
+		
 		write(output_file_handle, "$(taxPath)")
 		write(output_file_handle, "\t")
 		
-		taxPathSN = join(map(x->join(split(x,"_")[4:end],"_"),split(unique_taxa_name,"|")),"|");
+
 		write(output_file_handle, "$(taxPathSN)")
 		write(output_file_handle, "\t")
 		write(output_file_handle, "$(taxa_abundances[unique_taxa_name])")
