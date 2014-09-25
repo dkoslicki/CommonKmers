@@ -1,5 +1,5 @@
 # ==============================================================================
-# Evaluate.jl
+# ConvertToCAMIOutput.jl
 #
 # Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
 #
@@ -19,8 +19,8 @@ function parse_commandline()
         "--taxonomy_file", "-t"
 			help = "taxonomy file, the ith line is the taxonomy of the ith training organism"
         "--output_level", "-l"
-			help = "Output evolutionary related level, the lth entry of [1, .95, .8, .7, .6, .5, .4, .3, .2, .1]"
-			default = 1
+			help = "Output evolutionary related level, the lth entry of [1, .95, .8, .7, .6, .5, .4, .3, .2, .1]. Level of 0 means to sum over all of them."
+			default = 0
         "--output_taxonomic_rank", "-r"
 			help = "Output taxonomic rank, either an integer: 1, or a range [1:2]"
 			default = "[1:7]"
@@ -59,13 +59,33 @@ close(fid)
 taxonomy = map(x->strip(split(x)[3]), taxonomy)
 num_organisms = length(taxonomy)
 
-#Just select the ones in the output level of interest
-indicies_of_interest = range((output_level-1) * num_organisms, output_level * num_organisms)+1
+#If the output_level is not 0, just do that level
+if ~(output_level==0)
 
-#First, select the portion of the taxonomy that has a nonzero entry in the reconstruction
-cutoff = .00001
-support = indicies_of_interest[find(input[indicies_of_interest] .> cutoff)] #Support in the indicies of interest
-nonzero_taxonomy = taxonomy[(support .- (num_organisms*(output_level-1)))] #Shift everything left to the start since taxonomy has only num_organisms length
+	#Just select the ones in the output level of interest
+	indicies_of_interest = ((output_level-1) * num_organisms + 1):(output_level * num_organisms)
+
+	#First, select the portion of the taxonomy that has a nonzero entry in the reconstruction
+	cutoff = .00001
+	support = indicies_of_interest[find(input[indicies_of_interest] .> cutoff)] #Support in the indicies of interest
+	nonzero_taxonomy = taxonomy[(support .- (num_organisms*(output_level-1)))] #Shift everything left to the start since taxonomy has only num_organisms length
+elseif output_level==0
+	if ~(int(length(input)/num_organisms)==length(input)/num_organisms)
+		error("Input reconstruction is not a multiple of the number of organisms in the taxonomy file")
+	else
+		#Then add up each chunk of size num_organisms
+		input_temp = zeros(num_organisms);
+		for output_level_temp = 1:int(length(input)/num_organisms)
+			input_temp = input_temp + input[((output_level_temp-1) * num_organisms + 1):(output_level_temp * num_organisms)];
+		end
+		cutoff = .00001
+		support = find(input_temp .> cutoff) #Support in the indicies of interest
+		nonzero_taxonomy = taxonomy[support]
+	end
+else
+	error("non-valid output_level")
+end
+
 
 #open the output file
 output_file_handle = open(output_file,"w")
