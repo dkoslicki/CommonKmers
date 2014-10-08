@@ -27,7 +27,7 @@ function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
 	while any(Z) & any(w[Z[:]] .> tol)
 		#print("On iteration $(outeriter)\n")
 
-		outeriter = outeriter + 1;
+		outeriter = outeriter + 1; 
 		
 		# Reset intermediate solution z
 		z = zeros(n,1);
@@ -50,7 +50,7 @@ function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
 		
 		#inner loop to remove elements from the positive set which no longer belong
 		while any(z[P] .<= 0)
-			print("entering inner loop\n")
+			#print("entering inner loop\n")
 			iter = iter + 1;
 			if iter > itmax
 				print("lsqnonneg:IterationCountExceeded");
