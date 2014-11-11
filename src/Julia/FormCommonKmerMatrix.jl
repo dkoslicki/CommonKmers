@@ -34,7 +34,7 @@ end
     j = 1
     iTotal = 0
     jTotal = 0
-    while (i < iMax) & (j < jMax)
+    while (i <= iMax) & (j <= jMax)
         if iKmers[1,i] == jKmers[1,j]
             iTotal += iKmers[2,i]
             jTotal += jKmers[2,j]
