@@ -138,7 +138,7 @@ function main()
     end
     
     #Now delete the djf files
-    run(`cat $(file_names_path)` |> `xargs -I{} rm $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
+#    run(`cat $(file_names_path)` |> `xargs -I{} rm $(string(output_dir,"/")){}-$(kmer_size)mers.djf`)
 
 end
 
