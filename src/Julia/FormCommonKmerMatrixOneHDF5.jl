@@ -110,7 +110,7 @@ function main()
 	end
 
 	#Convert the matrix into something that HDF5 can write
-	CommonKmersMatrix2=convert(Array,CommonKmersMatrix)
+	CommonKmersMatrix2=convert(Array,CommonKmersMatrix)'
 
 	if isfile(out_file)
 		rm(out_file)
