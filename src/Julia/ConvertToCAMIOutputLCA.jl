@@ -1,11 +1,14 @@
 # ==============================================================================
-# ConvertToCAMIOutput.jl
+# ConvertToCAMIOutputLCA.jl
 #
 # Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
 #
 # Takes a raw reconstruction vector (flat text file of floats on the same basis
 # as the given taxonomy file) and outputs the classification in the CAMI format.
 # ==============================================================================
+
+#julia ConvertToCAMIOutputLCA.jl -i /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Samples/Classifications/testx_LCA.txt -t /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Taxonomy/FirstUniqueSpeciesFileNamesUniqueTaxonomyTaxID.txt -l 0 -o /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Samples/Classifications/test_classification_LCA.txt
+
 
 using ArgParse
 
@@ -85,6 +88,7 @@ elseif output_level==0
 else
 	error("non-valid output_level")
 end
+print(support)
 
 
 #open the output file
