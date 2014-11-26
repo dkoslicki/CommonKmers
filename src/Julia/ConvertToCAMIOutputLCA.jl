@@ -11,13 +11,11 @@
 
 ##################################################
 #Problems
-#1. Not summing up properly (over 1)
-#	2	superkingdom	2	Bacteria	7.102610962060221
-#2. Things like 
+#1. Things like 
 #	10239	superkingdom	10239	Viruses	0.00014223541777389574
 #	10239	phylum	10239|	Viruses|	3.950200757516657e-5
 #Note the phylum and superkingdom have the same taxID
-#3. Things like
+#2. Things like
 #	1379698	strain	2||2||2||1379697|1379698	Bacteria||Bacteria||Bacteria||candidate_division_ZIXI|candidate_division_ZIXI_bacterium_RBG_1	3.589021327883041e-5
 
 
@@ -131,9 +129,9 @@ for support_index = support
 	end
 end
 
-#Now sum up from finer taxonomic ranks to higher ones
-temp_dict = copy(output_taxonomy)
-for taxonomic_level = 8:-1:2
+#Now sum up from coarser taxonomic ranks to higher ones (summing finer to coarser for each taxa level)
+temp_dict = copy(output_taxonomy);
+for taxonomic_level = 2:8
 	for key in keys(temp_dict)# or use: key = [key for key in keys(output_taxonomy)]. Can't use key in keys(output_taxonomy) because those keys change
 		split_key = split(key,"|");
 		if length(split_key) == taxonomic_level
