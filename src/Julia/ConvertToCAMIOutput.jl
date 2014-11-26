@@ -130,7 +130,7 @@ for taxa_rank = taxa_rank_list
 		nonzero_taxonomy_split = split(taxonomy_string,"|")
 		if length(nonzero_taxonomy_split) >= taxa_rank
 			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
-			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input[support[nonzero_taxonomy_counter]]
+			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input_temp[support[nonzero_taxonomy_counter]]
 		end
 		nonzero_taxonomy_counter = nonzero_taxonomy_counter + 1
 	end
