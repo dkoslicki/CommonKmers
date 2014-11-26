@@ -9,6 +9,18 @@
 
 #julia ConvertToCAMIOutputLCA.jl -i /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Samples/Classifications/testx_LCA.txt -t /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Taxonomy/FirstUniqueSpeciesFileNamesUniqueTaxonomyTaxID.txt -l 0 -o /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Samples/Classifications/test_classification_LCA.txt
 
+##################################################
+#Problems
+#1. Not summing up properly (over 1)
+#	2	superkingdom	2	Bacteria	7.102610962060221
+#2. Things like 
+#	10239	superkingdom	10239	Viruses	0.00014223541777389574
+#	10239	phylum	10239|	Viruses|	3.950200757516657e-5
+#Note the phylum and superkingdom have the same taxID
+#3. Things like
+#	1379698	strain	2||2||2||1379697|1379698	Bacteria||Bacteria||Bacteria||candidate_division_ZIXI|candidate_division_ZIXI_bacterium_RBG_1	3.589021327883041e-5
+
+
 using HDF5
 using ArgParse
 
@@ -138,9 +150,8 @@ for taxonomic_level = 8:-1:2
 		end
 	end
 end
-#####################################################
-#Then print this out in the pretty format, loop over output_taxonomy and print the right length keys in the right places
-###################################################
+
+
 #open the output file
 output_file_handle = open(output_file,"w")
 
