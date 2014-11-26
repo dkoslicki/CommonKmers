@@ -90,6 +90,8 @@ else
 end
 
 ##New
+using HDF5
+hyp_threshes = [.9, .8, .7, .6, .5, .4, .3, .2, .1]
 cutoff = .00001
 support = find(input .> cutoff)
 #Create a massive taxonomy database
@@ -97,6 +99,72 @@ support = find(input .> cutoff)
 #Then do the the hypothetical organisms, doing the LCA, populating some of the higher taxonomy levels
 #Then starting at the bottom, increment (or create, as the case may be) the higher taxonomic levels
 #Then write the output.
+common_kmer_file = "/nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Output/FirstUniqueSpeciesFileNamesUnique-CommonKmers-40C.h5";
+common_kmer_matrix = float(h5read(common_kmer_file,"/common_kmers"))';
+common_kmer_matrix_normalized = common_kmer_matrix./diag(common_kmer_matrix)';
+
+output_taxonomy = Dict()
+for support_index = support
+	if support_index <= length(taxonomy) #If it's not a hypothetical organism
+		if haskey(output_taxonomy, taxonomy[support_index]) #If it's in there, add to it.
+			output_taxonomy[taxonomy[support_index]] = output_taxonomy[taxonomy[support_index]] + input[support_index]
+		else
+			output_taxonomy[taxonomy[support_index]] = input[support_index]
+		end
+	else #it's a hypothetical organism, so do the LCA here
+		corresponding_real_organism_index = mod(support_index,num_organisms);
+		column = common_kmer_matrix_normalized[corresponding_real_organism_index,:];
+		hyp_bin = int(floor(support_index/num_organisms)); #This is the bin it belongs to
+		hyp_thresh = hyp_threshes[hyp_bin]; #This is the corresponding threshold
+	
+		#LCA here
+		temp = column;
+		temp[corresponding_real_organism_index] = 0; #set the organism entry to 0
+		distances = abs(temp.-hyp_thresh); #distances between column and thresh
+		pos = indmin(distances); #This is the position of the nearest real organism to the threshold
+		#Now find the LCA between this organism and the hypothetical one
+		hyp_taxonomy_split = split(taxonomy[corresponding_real_organism_index],"|"); #Hyp taxonomy based on corresponding organism
+		candidate_LCA_taxnonmy_split = split(taxonomy[pos],"|"); #closest organism taxnonmy
+		LCA = 1; #In case it only agrees to the kingdom level, and we need to declare LCA as a global variable
+		for LCA_index = minimum([length(candidate_LCA_taxnonmy_split), length(hyp_taxonomy_split)]):-1:1
+			if hyp_taxonomy_split[LCA_index] == candidate_LCA_taxnonmy_split[LCA_index]
+				LCA = LCA_index
+				print(LCA_index)
+				break
+			end
+		end
+		#Now update the taxonomy dictionary
+		LCA_taxonomy = join(candidate_LCA_taxnonmy_split[1:LCA],"|")
+		if haskey(output_taxonomy,LCA_taxonomy) #If it's in there, add to it.
+			output_taxonomy[LCA_taxonomy] = output_taxonomy[LCA_taxonomy] + input[support_index]
+		else
+			output_taxonomy[LCA_taxonomy] = input[support_index]
+		end
+	end
+end
+
+#Now sum up from finer taxonomic ranks to higher ones
+temp_dict = copy(output_taxonomy)
+for taxonomic_level = 8:-1:2
+	for key in keys(temp_dict)
+		split_key = split(key,"|");
+		if length(split_key) == taxonomic_level
+			#loop through the higher taxonomic levels
+			for higher_level = (taxonomic_level-1):-1:1
+				higher_taxonomy = join(split_key[1:higher_level],"|")
+				#update the dictionary value
+				if haskey(output_taxonomy,higher_taxonomy) #If it's in there, add to it.
+					output_taxonomy[higher_taxonomy] = output_taxonomy[higher_taxonomy] + output_taxonomy[key] #add the value at the base taxonomy
+				else #If note, make it equal to the base taxonomy value
+					output_taxonomy[higher_taxonomy] = 1;#output_taxonomy[key]
+				end
+			end
+		end
+	end
+end
+
+#Then print this out in the pretty format
+
 
 #open the output file
 output_file_handle = open(output_file,"w")
