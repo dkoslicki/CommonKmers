@@ -123,6 +123,7 @@ for taxa_rank = taxa_rank_list
 		end
 	end
 	unique_taxa_names = sort(unique(taxa_names)); #This assumes that there's a bijection between taxa names and tax IDs
+	print(unique_taxa_names)
 
 	#Now loop through each of the non_zero taxonomies, see if the taxa name matches, and then add this to the abundances
 	taxa_abundances = Dict();
