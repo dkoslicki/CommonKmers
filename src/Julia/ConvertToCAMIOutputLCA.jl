@@ -92,7 +92,11 @@ end
 ##New
 cutoff = .00001
 support = find(input .> cutoff)
-
+#Create a massive taxonomy database
+#Do the non-hypothetical organisms first, populating the species and strains
+#Then do the the hypothetical organisms, doing the LCA, populating some of the higher taxonomy levels
+#Then starting at the bottom, increment (or create, as the case may be) the higher taxonomic levels
+#Then write the output.
 
 #open the output file
 output_file_handle = open(output_file,"w")
@@ -116,6 +120,10 @@ else
 	error("Input taxonomic rank should be an integer, or else don't include the option to output all ranks")
 end
 
+#Instead, loop over the support, incrementing the taxonomy if it's not a hypothetical organism, and doing the LCA if it is a hypothetical organism
+
+
+#This loops over the non-zero taxonomy, but if we do the LCA thing, the non-zero taxonomy is not in the same order as the output taxonomy
 for taxa_rank = [1]
 	taxa_names = cell(0);
 	for taxonomy_string = nonzero_taxonomy
@@ -138,7 +146,6 @@ for taxa_rank = [1]
 		if length(nonzero_taxonomy_split) >= taxa_rank
 			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
 			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input[support[nonzero_taxonomy_counter]]
-			print(input[support[nonzero_taxonomy_counter]])
 		end
 		nonzero_taxonomy_counter = nonzero_taxonomy_counter + 1
 	end
