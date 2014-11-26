@@ -123,7 +123,6 @@ for taxa_rank = taxa_rank_list
 		end
 	end
 	unique_taxa_names = sort(unique(taxa_names)); #This assumes that there's a bijection between taxa names and tax IDs
-	print(unique_taxa_names)
 
 	#Now loop through each of the non_zero taxonomies, see if the taxa name matches, and then add this to the abundances
 	taxa_abundances = Dict();
@@ -135,7 +134,7 @@ for taxa_rank = taxa_rank_list
 		nonzero_taxonomy_split = split(taxonomy_string,"|")
 		if length(nonzero_taxonomy_split) >= taxa_rank
 			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
-			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input[support[nonzero_taxonomy_counter]]
+			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input_temp[support[nonzero_taxonomy_counter]] #Use the summed input
 		end
 		nonzero_taxonomy_counter = nonzero_taxonomy_counter + 1
 	end
