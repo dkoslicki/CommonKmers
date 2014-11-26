@@ -144,9 +144,9 @@ for support_index = support
 end
 
 #Now sum up from finer taxonomic ranks to higher ones
-temp_dict = copy(output_taxonomy)
+#temp_dict = copy(output_taxonomy)
 for taxonomic_level = 8:-1:2
-	for key in keys(temp_dict)
+	for key = [key for key in keys(output_taxonomy)]# or use: key in keys(temp_dict). Can't use key in keys(output_taxonomy) because those keys change
 		split_key = split(key,"|");
 		if length(split_key) == taxonomic_level
 			#loop through the higher taxonomic levels
@@ -162,8 +162,9 @@ for taxonomic_level = 8:-1:2
 		end
 	end
 end
-
-#Then print this out in the pretty format
+#####################################################
+#Then print this out in the pretty format, loop over output_taxonomy and print the right length keys in the right places
+###################################################
 
 
 #open the output file
