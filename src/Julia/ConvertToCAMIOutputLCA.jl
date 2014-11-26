@@ -88,7 +88,7 @@ elseif output_level==0
 else
 	error("non-valid output_level")
 end
-print(support)
+print(input_temp[5])
 
 
 #open the output file
