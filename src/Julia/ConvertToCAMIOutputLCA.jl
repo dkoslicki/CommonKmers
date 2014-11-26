@@ -197,7 +197,7 @@ for taxa_name = taxa_names
 	taxPath = map(x->split(x,"_")[3],split(taxa_name,"|")); #Tax ID's
 	taxPathSN = map(x->join(split(x,"_")[4:end],"_"), split(taxa_name,"|")); #Taxa names
 	#If a Tax ID is repeated at a lower taxonomic rank, this means that that rank is missing, so let's just delete it.
-	for i=1:length(taxPath)
+	for i=length(taxPath):-1:2
 		if i>=2
 			if taxPath[i] == taxPath[i-1]
 				taxPath[i] = ""
