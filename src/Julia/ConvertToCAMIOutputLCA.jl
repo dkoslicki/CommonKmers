@@ -9,7 +9,7 @@
 
 #julia ConvertToCAMIOutputLCA.jl -i /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Samples/Classifications/testx_LCA.txt -t /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Taxonomy/FirstUniqueSpeciesFileNamesUniqueTaxonomyTaxID.txt -l 0 -o /nfs1/Koslicki_Lab/koslickd/CommonKmers/TrainingOnRepoPhlAn/Samples/Classifications/test_classification_LCA.txt
 
-
+using HDF5
 using ArgParse
 
 #Parse arguments
@@ -62,35 +62,8 @@ close(fid)
 taxonomy = map(x->strip(split(x)[3]), taxonomy)
 num_organisms = length(taxonomy)
 
-#If the output_level is not 0, just do that level
-if ~(output_level==0)
-
-	#Just select the ones in the output level of interest
-	indicies_of_interest = ((output_level-1) * num_organisms + 1):(output_level * num_organisms)
-
-	#First, select the portion of the taxonomy that has a nonzero entry in the reconstruction
-	cutoff = .00001
-	support = indicies_of_interest[find(input[indicies_of_interest] .> cutoff)] #Support in the indicies of interest
-	nonzero_taxonomy = taxonomy[(support .- (num_organisms*(output_level-1)))] #Shift everything left to the start since taxonomy has only num_organisms length
-elseif output_level==0
-	if ~(int(length(input)/num_organisms)==length(input)/num_organisms)
-		error("Input reconstruction is not a multiple of the number of organisms in the taxonomy file")
-	else
-		#Then add up each chunk of size num_organisms
-		input_temp = zeros(num_organisms);
-		for output_level_temp = 1:int(length(input)/num_organisms)
-			input_temp = input_temp + input[((output_level_temp-1) * num_organisms + 1):(output_level_temp * num_organisms)];
-		end
-		cutoff = .00001
-		support = find(input_temp .> cutoff) #Support in the indicies of interest
-		nonzero_taxonomy = taxonomy[support]
-	end
-else
-	error("non-valid output_level")
-end
-
 ##New
-using HDF5
+
 hyp_threshes = [.9, .8, .7, .6, .5, .4, .3, .2, .1]
 cutoff = .00001
 support = find(input .> cutoff)
@@ -129,7 +102,6 @@ for support_index = support
 		for LCA_index = minimum([length(candidate_LCA_taxnonmy_split), length(hyp_taxonomy_split)]):-1:1
 			if hyp_taxonomy_split[LCA_index] == candidate_LCA_taxnonmy_split[LCA_index]
 				LCA = LCA_index
-				print(LCA_index)
 				break
 			end
 		end
