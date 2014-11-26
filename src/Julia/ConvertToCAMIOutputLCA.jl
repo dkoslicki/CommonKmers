@@ -92,7 +92,6 @@ end
 ##New
 cutoff = .00001
 support = find(input .> cutoff)
-print(support)
 
 
 #open the output file
@@ -117,7 +116,7 @@ else
 	error("Input taxonomic rank should be an integer, or else don't include the option to output all ranks")
 end
 
-for taxa_rank = taxa_rank_list	
+for taxa_rank = [1]
 	taxa_names = cell(0);
 	for taxonomy_string = nonzero_taxonomy
 		nonzero_taxonomy_split = split(taxonomy_string,"|")
