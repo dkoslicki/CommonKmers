@@ -144,9 +144,9 @@ for support_index = support
 end
 
 #Now sum up from finer taxonomic ranks to higher ones
-#temp_dict = copy(output_taxonomy)
+temp_dict = copy(output_taxonomy)
 for taxonomic_level = 8:-1:2
-	for key = [key for key in keys(output_taxonomy)]# or use: key in keys(temp_dict). Can't use key in keys(output_taxonomy) because those keys change
+	for key in keys(temp_dict)# or use: key = [key for key in keys(output_taxonomy)]. Can't use key in keys(output_taxonomy) because those keys change
 		split_key = split(key,"|");
 		if length(split_key) == taxonomic_level
 			#loop through the higher taxonomic levels
@@ -156,7 +156,7 @@ for taxonomic_level = 8:-1:2
 				if haskey(output_taxonomy,higher_taxonomy) #If it's in there, add to it.
 					output_taxonomy[higher_taxonomy] = output_taxonomy[higher_taxonomy] + output_taxonomy[key] #add the value at the base taxonomy
 				else #If note, make it equal to the base taxonomy value
-					output_taxonomy[higher_taxonomy] = 1;#output_taxonomy[key]
+					output_taxonomy[higher_taxonomy] = output_taxonomy[key]
 				end
 			end
 		end
@@ -165,8 +165,6 @@ end
 #####################################################
 #Then print this out in the pretty format, loop over output_taxonomy and print the right length keys in the right places
 ###################################################
-
-
 #open the output file
 output_file_handle = open(output_file,"w")
 
@@ -180,103 +178,62 @@ write(output_file_handle,"@Ranks: superkingdom|phylum|class|order|family|genus|s
 write(output_file_handle,"\n")
 write(output_file_handle,"@@TAXID\tRANK\tTAXPATH\tTAXPATH_SN\tPERCENTAGE\n")
 
-#Now for each of the ranks, get the unique names, then loop over the non-zero taxonomy, increasing the value of the unique taxa name, then output these to the file
-if typeof(output_taxonomic_rank) == Int64
-	taxa_rank_list = [output_taxonomic_rank]
-elseif typeof(output_taxonomic_rank) == Array{Int64,1}
-	taxa_rank_list = output_taxonomic_rank
-else
-	error("Input taxonomic rank should be an integer, or else don't include the option to output all ranks")
-end
+taxa_names = [key for key in keys(output_taxonomy)];
+taxa_names = sort(taxa_names, by=x->length(split(x,"|")));
 
-#Instead, loop over the support, incrementing the taxonomy if it's not a hypothetical organism, and doing the LCA if it is a hypothetical organism
-
-
-#This loops over the non-zero taxonomy, but if we do the LCA thing, the non-zero taxonomy is not in the same order as the output taxonomy
-for taxa_rank = [1]
-	taxa_names = cell(0);
-	for taxonomy_string = nonzero_taxonomy
-		nonzero_taxonomy_split = split(taxonomy_string,"|")
-		if length(nonzero_taxonomy_split) >= taxa_rank
-			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
-			append!(taxa_names, {taxa_name})
-		end
+for taxa_name = taxa_names
+	taxID = split(split(taxa_name,"|")[end],"_")[3];
+	write(output_file_handle, "$(taxID)")
+	write(output_file_handle, "\t")
+	
+	rankAbvr = split(split(taxa_name,"|")[end],"_")[1];
+	if rankAbvr == "k"
+		rank = "superkingdom"
+	elseif rankAbvr == "p"
+		rank = "phylum"
+	elseif rankAbvr == "c"
+		rank = "class"
+	elseif rankAbvr == "o"
+		rank = "order"
+	elseif rankAbvr == "f"
+		rank = "family"
+	elseif rankAbvr == "g"
+		rank = "genus"
+	elseif rankAbvr == "s"
+		rank = "species"
+	elseif rankAbvr == "t"
+		rank = "strain"
+	else
+		rank = "unknown"
 	end
-	unique_taxa_names = sort(unique(taxa_names)); #This assumes that there's a bijection between taxa names and tax IDs
-
-	#Now loop through each of the non_zero taxonomies, see if the taxa name matches, and then add this to the abundances
-	taxa_abundances = Dict();
-	for unique_taxa_name = unique_taxa_names
-			taxa_abundances[unique_taxa_name] = 0
-	end
-	nonzero_taxonomy_counter = 1
-	for taxonomy_string = nonzero_taxonomy
-		nonzero_taxonomy_split = split(taxonomy_string,"|")
-		if length(nonzero_taxonomy_split) >= taxa_rank
-			taxa_name = join(nonzero_taxonomy_split[1:taxa_rank],"|")
-			taxa_abundances[taxa_name] = taxa_abundances[taxa_name] + input[support[nonzero_taxonomy_counter]]
-		end
-		nonzero_taxonomy_counter = nonzero_taxonomy_counter + 1
-	end
-	for unique_taxa_name = unique_taxa_names
-		taxID = split(split(unique_taxa_name,"|")[end],"_")[3];
-		write(output_file_handle, "$(taxID)")
-		write(output_file_handle, "\t")
+	write(output_file_handle, "$(rank)")
+	write(output_file_handle, "\t")
 		
-		rankAbvr = split(split(unique_taxa_name,"|")[end],"_")[1];
-		if rankAbvr == "k"
-			rank = "superkingdom"
-		elseif rankAbvr == "p"
-			rank = "phylum"
-		elseif rankAbvr == "c"
-			rank = "class"
-		elseif rankAbvr == "o"
-			rank = "order"
-		elseif rankAbvr == "f"
-			rank = "family"
-		elseif rankAbvr == "g"
-			rank = "genus"
-		elseif rankAbvr == "s"
-			rank = "species"
-		elseif rankAbvr == "t"
-			rank = "string"
-		else
-			rank = "unknown"
-		end
-		write(output_file_handle, "$(rank)")
-		write(output_file_handle, "\t")
-		
-		taxPath = map(x->split(x,"_")[3],split(unique_taxa_name,"|")); #Tax ID's
-		taxPathSN = map(x->join(split(x,"_")[4:end],"_"),split(unique_taxa_name,"|")); #Taxa names
-		
-		#If a Tax ID is repeated at a lower taxonomic rank, this means that that rank is missing, so let's just delete it.
-		for i=1:length(taxPath)
-			if i>=2
-				if taxPath[i] == taxPath[i-1]
-					taxPath[i] = ""
-					taxPathSN[i] = ""
-				end
+	taxPath = map(x->split(x,"_")[3],split(taxa_name,"|")); #Tax ID's
+	taxPathSN = map(x->join(split(x,"_")[4:end],"_"), split(taxa_name,"|")); #Taxa names
+	#If a Tax ID is repeated at a lower taxonomic rank, this means that that rank is missing, so let's just delete it.
+	for i=1:length(taxPath)
+		if i>=2
+			if taxPath[i] == taxPath[i-1]
+				taxPath[i] = ""
+				taxPathSN[i] = ""
 			end
 		end
-		#Join back up the paths
-		taxPath = join(taxPath,"|")
-		taxPathSN = join(taxPathSN,"|")
-		
-		write(output_file_handle, "$(taxPath)")
-		write(output_file_handle, "\t")
-		
-
-		write(output_file_handle, "$(taxPathSN)")
-		write(output_file_handle, "\t")
-		write(output_file_handle, "$(taxa_abundances[unique_taxa_name])")
-		write(output_file_handle, "\n")
 	end
+	#Join back up the paths
+	taxPath = join(taxPath,"|")
+	taxPathSN = join(taxPathSN,"|")
+	
+	write(output_file_handle, "$(taxPath)")
+	write(output_file_handle, "\t")
+	
+	write(output_file_handle, "$(taxPathSN)")
+	write(output_file_handle, "\t")
+	write(output_file_handle, "$(output_taxonomy[taxa_name])")
+	write(output_file_handle, "\n")
 end
 
 #Close the output file
 close(output_file_handle)
 
-
-
-
-
+exit()
