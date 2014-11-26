@@ -86,6 +86,10 @@ for support_index = support
 		end
 	else #it's a hypothetical organism, so do the LCA here
 		corresponding_real_organism_index = mod(support_index,num_organisms);
+		#fix zero guy
+		if corresponding_real_organism_index == 0
+			corresponding_real_organism_index = num_organisms
+		end
 		column = common_kmer_matrix_normalized[corresponding_real_organism_index,:];
 		hyp_bin = int(floor(support_index/num_organisms)); #This is the bin it belongs to
 		hyp_thresh = hyp_threshes[hyp_bin]; #This is the corresponding threshold
