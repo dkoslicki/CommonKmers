@@ -22,12 +22,6 @@ function parse_commandline()
 			help = "Input raw reconstruction text file"
         "--taxonomy_file", "-t"
 			help = "taxonomy file, the ith line is the taxonomy of the ith training organism"
-        "--output_level", "-l"
-			help = "Output evolutionary related level, the lth entry of [1, .95, .8, .7, .6, .5, .4, .3, .2, .1]. Level of 0 means to sum over all of them."
-			default = 0
-        "--output_taxonomic_rank", "-r"
-			help = "Output taxonomic rank, either an integer: 1, or a range [1:2]"
-			default = "[1:7]"
 		"--output_file", "-o"
 			help = "Output text file"
 		"--sample_ID", "-I"
@@ -44,11 +38,13 @@ end
 parsed_args = parse_commandline()
 input_file = parsed_args["input_file"]
 taxonomy_file = parsed_args["taxonomy_file"]
-output_level = int(parsed_args["output_level"])
-output_taxonomic_rank = eval(parse(parsed_args["output_taxonomic_rank"]))
 output_file = parsed_args["output_file"]
 sample_ID = parsed_args["sample_ID"]
 contestant_ID = parsed_args["contestant_ID"]
+
+#Constants, make these options next
+hyp_threshes = [.9, .8, .7, .6, .5, .4, .3, .2, .1]
+cutoff = .00001
 
 #Read in the input file
 fid = open(input_file,"r")
@@ -63,10 +59,7 @@ close(fid)
 taxonomy = map(x->strip(split(x)[3]), taxonomy)
 num_organisms = length(taxonomy)
 
-##New
-
-hyp_threshes = [.9, .8, .7, .6, .5, .4, .3, .2, .1]
-cutoff = .00001
+#New
 support = find(input .> cutoff)
 #Create a massive taxonomy database
 #Do the non-hypothetical organisms first, populating the species and strains
