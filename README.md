@@ -1,4 +1,6 @@
 # CommonKmers #
+This is a work in progress, and not yet ready for use.
+
 This is the source code for CommonKmers.
 
 ## What is CommonKmers? ##

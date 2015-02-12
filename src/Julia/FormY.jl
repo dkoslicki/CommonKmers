@@ -107,6 +107,7 @@ function main()
 	for i=1:length(Y2)
 		write(fid, "$(Y2[i])\n")
 	end
+	close(fid)
 	
 end
 
