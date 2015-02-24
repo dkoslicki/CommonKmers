@@ -14,8 +14,8 @@ Please refer to [the Julia installation page](http://julialang.org/downloads/) t
 You will need to add the HDF5 and ArgParse packages. These can be added using `Pkg.add("HDF5")` and `Pkg.add("ArgParse")`.
 
 
-##### Running the Julia version #####
-To classify a sample using the Julia version, use the commands
+## Running the program ##
+To classify a sample using the Julia version, use the following commands
 
 
 ## Contact ##
