@@ -1,23 +1,6 @@
 #This is the function to classify the grinder experiments
 #This uses the bcalm compressed kmer counts
 
-
-#This assumes that the jellyfish djf files have already been formed, dumped, AND SORTED!
-#jellyfish count SRR172902Even.fasta -m 30 -t 10 -s 100M -C -o SRR172902Even.fasta-30mers.jf
-#jellyfish dump SRR172902Even.fasta-30mers.jf -c -t -o SRR172902Even.fasta-30mers.djf
-#LC_ALL=C sort --buffer-size=10G --temporary-directory=/data/temp SRR172902Even.fasta-30mers.djf -o SRR172902Even.fasta-30mers.djf
-#jellyfish count SRR172902Even.fasta -m 50 -t 10 -s 100M -C -o SRR172902Even.fasta-50mers.jf
-#jellyfish dump SRR172902Even.fasta-50mers.jf -c -t -o SRR172902Even.fasta-50mers.djf
-#I will first need to hash it, then sort it.
-#First hash the 50mers djf file, then sort it, then form the the kcounts file
-#HashDJFFunction(output_dir, sample_name, 50)
-#LC_ALL=C sort --buffer-size=10G --temporary-directory=/data/temp SRR172902Even.fasta-50mers.djf -o SRR172902Even.fasta-50mers.djf
-
-#Removed the stuff about sorting in linux
-
-
-#Might be able to use the eval() method of forming djf file, as I'm only doing this on a few files, the number of file handles won't matter as much
-
 #Load the required files
 include("lsqnonneg.jl")
 include("ConvertToCAMIOutputLCAFunctionDefault.jl")
@@ -41,7 +24,7 @@ function parse_commandline()
 			help = "Type of output file. Options are: sensitive, specific, and default."
 			default = "default"
 		"--jellyfish_binary", "-j"
-			help = "Location of jellyfish binary"
+			help = "Location of jellyfish binary. eg ~/bin/./jellyfish"
 			default = "/home/pi/koslickd/jellyfish-2.1.1/bin/./jellyfish"
     end
     return parse_args(s)
