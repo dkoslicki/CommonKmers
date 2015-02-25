@@ -18,7 +18,8 @@ You will need to add the HDF5 and ArgParse packages. These can be added using `P
 
 ## Running the program ##
 To classify a sample using the Julia version, use the ``Classify.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads is given by
-```julia -p 48 Classify.jl -d ../Data/ -o /path/to/output/dir/ -i /path/to/input/file.fa -k sensitive```
+
+``julia -p 48 Classify.jl -d ../Data/ -o /path/to/output/dir/ -i /path/to/input/file.fa -k sensitive -j /path/to/./jellyfish``
 
 Both FASTA and FASTQ files are acceptable input.
 
