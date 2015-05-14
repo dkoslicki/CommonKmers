@@ -1,6 +1,7 @@
 using HDF5
 using ArgParse
 
+
 function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
 	#set the tolerance
 	(m,n) = size(C);
@@ -344,6 +345,9 @@ function parse_commandline()
 		"--jellyfish_binary", "-j"
 			help = "Location of jellyfish binary. eg ~/bin/./jellyfish"
 			default = "jellyfish"
+		"--contestant_ID", "-c"
+			help = "Contestant ID"
+			default = "CONTESTANTID"
     end
     return parse_args(s)
 end
@@ -355,6 +359,8 @@ end
 @everywhere input_file_name = parsed_args["input_file_name"]
 @everywhere kind = parsed_args["kind"]
 @everywhere jellyfish_binary = parsed_args["jellyfish_binary"]
+@everywhere contestant_ID = parsed_args["contestant_ID"];
+@everywhere sample_ID = input_file_name
 
 #Set the input/output files
 @everywhere file_names_path = "$(data_dir)/UniqueSpeciesFileNamesPruned.txt";
@@ -451,8 +457,6 @@ close(fid)
 #Convert to CAMI format, use 30mer matrix to do the LCA
 A = float(h5read(A30_file,"/common_kmers"))'; #This was before I was transposing everything
 A_norm = A./diag(A)';
-sample_ID = "SAMPLEID";
-contestant_ID = "CONTESTANTID";
 
 
 if kind=="default" || kind=="specific" || kind=="sensitive"
