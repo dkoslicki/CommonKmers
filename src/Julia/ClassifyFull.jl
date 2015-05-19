@@ -345,6 +345,9 @@ function parse_commandline()
 		"--jellyfish_binary", "-j"
 			help = "Location of jellyfish binary. eg ~/bin/./jellyfish"
 			default = "jellyfish"
+		"--query_per_sequence_binary", "-q"
+			help = "Location of the query_per_sequence binary. eg ~/bin/./query_per_sequence"
+			default = "query_per_sequence"
 		"--contestant_ID", "-c"
 			help = "Contestant ID"
 			default = "CONTESTANTID"
@@ -359,6 +362,7 @@ end
 @everywhere input_file_name = parsed_args["input_file_name"]
 @everywhere kind = parsed_args["kind"]
 @everywhere jellyfish_binary = parsed_args["jellyfish_binary"]
+@everywhere query_per_sequence_binary = parsed_args["query_per_sequence_binary"]
 @everywhere contestant_ID = parsed_args["contestant_ID"];
 @everywhere sample_ID = input_file_name
 
@@ -384,11 +388,11 @@ run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100
 close(fid);
 @everywhere num_files = length(file_names);
 #do it once to read the jf and bcalms into memory
-temp=readall(`$(data_dir)./query_per_sequence $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
-Y30 = pmap(x->int(readall(`$(data_dir)./query_per_sequence $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
+temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
+Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
 #now for the 50mers
-temp=readall(`$(data_dir)./query_per_sequence $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
-Y50 = pmap(x->int(readall(`$(data_dir)./query_per_sequence $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
+temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
+Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
 y30 = Y30/sum(Y30);
 y50 = Y50/sum(Y50);
 
