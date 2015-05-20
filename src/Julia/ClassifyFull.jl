@@ -388,11 +388,11 @@ run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100
 close(fid);
 @everywhere num_files = length(file_names);
 #do it once to read the jf and bcalms into memory
-temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
-Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
+temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms50/$(file_names[1])-50mers.bcalm.fa`);
+Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms50/$(file_names[x])-50mers.bcalm.fa`)),[1:num_files]);
 #now for the 50mers
-temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
-Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
+temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms50/$(file_names[1])-50mers.bcalm.fa`);
+Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms50/$(file_names[x])-50mers.bcalm.fa`)),[1:num_files]);
 y30 = Y30/sum(Y30);
 y50 = Y50/sum(Y50);
 
