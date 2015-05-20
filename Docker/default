@@ -23,5 +23,5 @@ do
 	fi
 	#prep and classify sample
 	gunzip -c -d $file > /tmp/input.fq
-	julia -p $DCKR_THREADS /usr/local/sbin/ClassifyFull.jl -i /tmp/input.fq -d $CONT_DATABASES_DIR/CommonKmersData -k default -o ${CONT_PROFILING_FILES}/${file}_classified.tsv
+	julia -p $DCKR_THREADS /usr/local/sbin/ClassifyFull.jl -j /jellyfish/jellyfish-2.2.0/bin/./jellyfish -i /tmp/input.fq -d $CONT_DATABASES_DIR/CommonKmersData -k default -o ${CONT_PROFILING_FILES}/${file}_classified.tsv
 done
