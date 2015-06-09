@@ -22,6 +22,16 @@ do
 		echo "The file $file does not exist. Please make sure it is accessible in /dckr/mnt/input/. Hint, include the following command when starting docker: -v /path/to/input/dir:/dckr/mnt/input:ro" 1>&2
 	fi
 	#prep and classify sample
-	gunzip -c -d $file > /tmp/input.fq
+	#decompress
+	gunzip -c -d $file > /tmp/input_temp.fq
+	#Convert to only ACTGN characters
+	awk '{if(NR%4==2){gsub(/[^ACGT]/,"N");print $0}else{print $0}}' /tmp/input_temp.fq > /tmp/input_ACTGN.fq
+	rm /tmp/input_temp.fq
+	#Convert low-quality bases to N
+	#use quality score given by `compute quality scores | get first quartile column | delete header | compute average | convert to int`
+	/Fastx/bin/./fastq_masker -i /tmp/input_ACTGN.fq -o /tmp/input.fq -Q33 -q `/Fastx/bin/./fastx_quality_stats -i /tmp/input_ACTGN.fq -Q33 | cut -f7 | sed -n '1!p' | awk '{a+=$1} END{print a/NR}' | awk '{printf "%.0f",$1}'`
+	rm /tmp/input_ACTGN.fq
+	cd /tmp
 	julia -p $DCKR_THREADS /usr/local/sbin/ClassifyFull.jl -j /jellyfish/jellyfish-2.2.0/bin/./jellyfish -i /tmp/input.fq -d $CONT_DATABASES_DIR/CommonKmersData -k specific -o ${CONT_PROFILING_FILES}/${file}_classified.tsv
+	cd /dckr/mnt/input
 done
