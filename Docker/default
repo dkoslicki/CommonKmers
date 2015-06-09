@@ -8,9 +8,9 @@ then
 fi
 
 #check if Data folder is present
-if [ ! -d /dckr/mnt/camiref/Data ]
+if [ ! -d /dckr/mnt/camiref/CommonKmersData ]
 then
-	echo "Data directory missing. Hint, include the following command when starting docker: -v /path/to/local/Data:/dckr/mnt/camiref/Data:ro" 1>&2
+	echo "Data directory missing. Hint, include the following command when starting docker: -v /path/to/local/Data:/dckr/mnt/camiref/CommonKmersData:ro" 1>&2
 fi
 
 cd /dckr/mnt/input
