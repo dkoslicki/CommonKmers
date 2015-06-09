@@ -35,6 +35,12 @@ RUN apt-get install -y git && \
 #Install gzip
 RUN apt-get install -y gzip
 
+#Install fastx toolkit
+RUN mkdir Fastx && \
+ cd Fastx && \
+ wget http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2 && \
+ tar -jxf fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2
+
 #Create tasks
 RUN cp /CommonKmers/Docker/default /dckr/etc/tasks.d/default && \
  cp /CommonKmers/Docker/sensitive /dckr/etc/tasks.d/sensitive && \
