@@ -315,7 +315,7 @@ for taxa_name = taxa_names
 	
 		write(output_file_handle, "$(taxPathSN)")
 		write(output_file_handle, "\t")
-		write(output_file_handle, "$(output_taxonomy[taxa_name])")
+		write(output_file_handle, "$(100*output_taxonomy[taxa_name])") #Turn into a frequency (i.e. 90 not .9)
 		write(output_file_handle, "\n")
 	end
 end
