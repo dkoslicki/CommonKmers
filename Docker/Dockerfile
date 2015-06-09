@@ -30,7 +30,8 @@ RUN apt-get install -y git && \
  git clone https://github.com/dkoslicki/CommonKmers.git && \
  cd /CommonKmers/src/QueryPerSeq/ && \
  g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.0/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.0/.libs query_per_sequence.cc sequence_mers.hpp -o query_per_sequence && \
- cp /CommonKmers/src/QueryPerSeq/query_per_sequence /usr/local/bin
+ cp /CommonKmers/src/QueryPerSeq/query_per_sequence /usr/local/bin && \
+ cp /CommonKmers/src/Julia/ClassifyFull.jl /usr/local/sbin/ClassifyFull.jl
 
 #Install gzip
 RUN apt-get install -y gzip
