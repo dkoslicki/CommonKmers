@@ -8,6 +8,7 @@ CommonKmers is a k-mer based bacterial community reconstruction technique that u
 
 
 ## How Do I Install CommonKmers? ##
+#Build from source#
 You will need the Kmer counting tool Jellyfish to be installed. Please see [the Jellyfish installation page](http://www.genome.umd.edu/jellyfish.html) for installation directions.
 
 You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz). Place this file in the CommonKmers directory, and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
