@@ -38,15 +38,16 @@ To classify a sample using the Julia version, use the ``ClassifyFull.jl`` comman
 julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/dir/ -i /path/to/input/file.fa -k sensitive -j /path/to/./jellyfish
 ```
 
-Both FASTA and FASTQ files are acceptable input.
+Both FASTA and FASTQ files are acceptable input. No error correction is performed.
 
 ###Using Docker###
 To run the tool from docker, mount the appropriate folders and run using the following command:
 ```bash
-docker run -v /path/to/CommonKmersDataTest:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
+docker run -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
 ```
 where ``[type]`` is one of ``default, sensitive, specific``.
 In the input folder must be a collection of gzipped FASTQ (not FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
+Note that the Docker version performs some basic error-correction, while the command-line version assumes this has already been performed.
 
 ## Output format ##
 The output format complies with the [CAMI format](https://github.com/CAMI-challenge/contest_information/blob/master/file_formats/CAMI_TP_specification.mkd).
