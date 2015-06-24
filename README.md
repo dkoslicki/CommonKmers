@@ -32,22 +32,22 @@ docker build -t username/imagename .
 
 ## Running the program ##
 ###From the command line###
-To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads is given by
+To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads and a minimum quality score (for kmers to be counted) of C (phred33 ascii code 35) is given by
 
 ```julia
-julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/dir/ -i /path/to/input/file.fa -k sensitive -j /path/to/./jellyfish
+julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/dir/ -i /path/to/input/file.fa -Q C -k sensitive -j /path/to/./jellyfish
 ```
 
-Both FASTA and FASTQ files are acceptable input. No error correction is performed.
+Both FASTA and FASTQ files are acceptable input.
 
 ###Using Docker###
 To run the tool from docker, mount the appropriate folders and run using the following command:
 ```bash
-docker run -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
+docker run -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
 ```
 where ``[type]`` is one of ``default, sensitive, specific``.
 In the input folder must be a collection of gzipped FASTQ (not FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
-Note that the Docker version performs some basic error-correction, while the command-line version assumes this has already been performed.
+If the environmental variable ``QUALITY`` is not passed to docker, a default value of "C" will be used.
 
 ## Output format ##
 The output format complies with the [CAMI format](https://github.com/CAMI-challenge/contest_information/blob/master/file_formats/CAMI_TP_specification.mkd).
