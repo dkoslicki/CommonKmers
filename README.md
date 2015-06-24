@@ -43,11 +43,14 @@ Both FASTA and FASTQ files are acceptable input.
 ###Using Docker###
 To run the tool from docker, mount the appropriate folders and run using the following command:
 ```bash
-docker run -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
+docker run --rm -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
 ```
-where ``[type]`` is one of ``default, sensitive, specific``.
 In the input folder must be a collection of gzipped FASTQ (not FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
-If the environmental variable ``QUALITY`` is not passed to docker, a default value of "C" will be used. 
+Here ``[type]`` is one of ``default, sensitive, specific``.
+The ``--rm`` flag deletes temporary files after exit (otherwise they might persist in ``/var/lib/docker/volumes`` or the like).
+If the environmental variable ``QUALITY`` is not passed to docker (via ``-e QUALITY=<ascii character>``, a default value of "C" will be used. 
+
+
 
 ## Output format ##
 The output format complies with the [CAMI format](https://github.com/CAMI-challenge/contest_information/blob/master/file_formats/CAMI_TP_specification.mkd).
