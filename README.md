@@ -57,7 +57,7 @@ The docker complies with the [Bioboxes profiling format 0.9](https://github.com/
 I recommend using a quality score equal to the average first quartile quality score in the file. This can be found with the following commands:
 ```bash
 awk '{if(NR%4==2){gsub(/[^ACGT]/,"N");print $0}else{print $0}}' input.fq > input_ACTGN.fq 
-/Fastx/bin/./fastq_masker -i /tmp/input_ACTGN.fq -o /tmp/input.fq -Q33 -q `/Fastx/bin/./fastx_quality_stats -i /tmp/input_ACTGN.fq -Q33 | cut -f7 | sed -n '1!p' | awk '{a+=$1} END{print a/NR}' | awk '{printf "%.0f",$1}'`
+/Fastx/bin/./fastx_quality_stats -i input_ACTGN.fq -Q33 | cut -f7 | sed -n '1!p' | awk '{a+=$1} END{print a/NR}' | awk '{printf "%.0f",$1}'
 ```
 The FastX toolbox can be downloaded [here](http://hannonlab.cshl.edu/fastx_toolkit/).
 ## Contact ##
