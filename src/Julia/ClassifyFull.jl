@@ -351,6 +351,9 @@ function parse_commandline()
 		"--contestant_ID", "-c"
 			help = "Contestant ID"
 			default = "CONTESTANTID"
+		"--quality", "-Q"
+			help = "minimum per-base quality score required to include kmer"
+			default = "C"
     end
     return parse_args(s)
 end
@@ -365,6 +368,7 @@ end
 @everywhere query_per_sequence_binary = parsed_args["query_per_sequence_binary"]
 @everywhere contestant_ID = parsed_args["contestant_ID"];
 @everywhere sample_ID = input_file_name
+@everywhere quality = parsed_args["quality"]
 
 #Set the input/output files
 @everywhere file_names_path = "$(data_dir)/UniqueSpeciesFileNamesPruned.txt";
@@ -379,8 +383,8 @@ end
 @everywhere num_threads = length(workers());
 
 #form the jf files
-run(`$(jellyfish_binary) count $(input_file_name) -m 30 -t $(num_threads) -s 100M -C -o $(basename(input_file_name))-30mers.jf`);
-run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100M -C -o $(basename(input_file_name))-50mers.jf`);
+run(`$(jellyfish_binary) count $(input_file_name) -m 30 -t $(num_threads) -s 100M -C -Q $(quality) -o $(basename(input_file_name))-30mers.jf`);
+run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100M -C -Q $(quality) -o $(basename(input_file_name))-50mers.jf`);
 
 #Form the Y functions
 @everywhere fid = open(file_names_path,"r");
