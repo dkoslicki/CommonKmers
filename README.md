@@ -47,12 +47,19 @@ docker run -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:/dckr
 ```
 where ``[type]`` is one of ``default, sensitive, specific``.
 In the input folder must be a collection of gzipped FASTQ (not FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
-If the environmental variable ``QUALITY`` is not passed to docker, a default value of "C" will be used.
+If the environmental variable ``QUALITY`` is not passed to docker, a default value of "C" will be used. 
 
 ## Output format ##
 The output format complies with the [CAMI format](https://github.com/CAMI-challenge/contest_information/blob/master/file_formats/CAMI_TP_specification.mkd).
 The docker complies with the [Bioboxes profiling format 0.9](https://github.com/bioboxes/rfc/tree/master/data-format).
 
+## Recommendations ##
+I recommend using a quality score equal to the average first quartile quality score in the file. This can be found with the following commands:
+```bash
+awk '{if(NR%4==2){gsub(/[^ACGT]/,"N");print $0}else{print $0}}' input.fq > input_ACTGN.fq 
+/Fastx/bin/./fastq_masker -i /tmp/input_ACTGN.fq -o /tmp/input.fq -Q33 -q `/Fastx/bin/./fastx_quality_stats -i /tmp/input_ACTGN.fq -Q33 | cut -f7 | sed -n '1!p' | awk '{a+=$1} END{print a/NR}' | awk '{printf "%.0f",$1}'`
+```
+The FastX toolbox can be downloaded [here](http://hannonlab.cshl.edu/fastx_toolkit/).
 ## Contact ##
 For issues with this software, contact david.koslicki@math.oregonstate.edu
 
