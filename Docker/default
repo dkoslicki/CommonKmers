@@ -33,10 +33,3 @@ do
 	cd /dckr/mnt/input
 done
 
-#Convert to only ACTGN characters
-#awk '{if(NR%4==2){gsub(/[^ACGT]/,"N");print $0}else{print $0}}' /tmp/input_temp.fq > /tmp/input_ACTGN.fq
-#rm /tmp/input_temp.fq
-#Convert low-quality bases to N
-#use quality score given by `compute quality scores | get first quartile column | delete header | compute average | convert to int`
-#/Fastx/bin/./fastq_masker -i /tmp/input_ACTGN.fq -o /tmp/input.fq -Q33 -q `/Fastx/bin/./fastx_quality_stats -i /tmp/input_ACTGN.fq -Q33 | cut -f7 | sed -n '1!p' | awk '{a+=$1} END{print a/NR}' | awk '{printf "%.0f",$1}'`
-#rm /tmp/input_ACTGN.fq
