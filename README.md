@@ -35,10 +35,10 @@ docker build -t username/imagename .
 To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads and a minimum quality score (for kmers to be counted) of C (phred33 ascii code 35) is given by
 
 ```julia
-julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/dir/ -i /path/to/input/file.fa -Q C -k sensitive -j /path/to/./jellyfish
+julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/dir/ -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish
 ```
 
-Both FASTA and FASTQ files are acceptable input.
+Only FASTQ files are acceptable input.
 
 ###Using Docker###
 To run the tool from docker, mount the appropriate folders and run using the following command:
@@ -57,7 +57,7 @@ The output format complies with the [CAMI format](https://github.com/CAMI-challe
 The docker complies with the [Bioboxes profiling format 0.9](https://github.com/bioboxes/rfc/tree/master/data-format).
 
 ## Recommendations ##
-I recommend using a quality score equal to the average first quartile quality score in the file. This can be found with the following commands:
+I recommend using a quality score roughly equal to the average first quartile quality score in the file. This can be found with the following commands:
 ```bash
 #Convert non ACTGN characters to N
 awk '{if(NR%4==2){gsub(/[^ACGT]/,"N");print $0}else{print $0}}' input.fq > input_ACTGN.fq 
