@@ -253,13 +253,13 @@ output_file_handle = open(output_file,"w")
 
 #Write the header
 write(output_file_handle,"# CAMI Submission for Taxonomic Profiling\n")
-write(output_file_handle, "@Task:Profiling\n")
-write(output_file_handle,"@Version:1.0\n")
-write(output_file_handle,"@ContestantID:CONTESTANTID\n")
+#write(output_file_handle, "@Task:Profiling\n")
+write(output_file_handle,"@Version:0.9.1\n")
+#write(output_file_handle,"@ContestantID:CONTESTANTID\n")
 write(output_file_handle,"@SampleID:$(sample_ID)\n")
 write(output_file_handle,"@Ranks: superkingdom|phylum|class|order|family|genus|species|strain\n")
 write(output_file_handle,"\n")
-write(output_file_handle,"@@TAXID\tRANK\tTAXPATH\tTAXPATH_SN\tPERCENTAGE\n")
+write(output_file_handle,"@@TAXID\tRANK\tTAXPATH\tTAXPATHSN\tPERCENTAGE\n")
 
 taxa_names = [key for key in keys(output_taxonomy)];
 taxa_names = sort(taxa_names, by=x->length(split(x,"|")));
