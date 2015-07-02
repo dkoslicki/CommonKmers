@@ -35,7 +35,7 @@ docker build -t username/imagename .
 To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads and a minimum quality score (for kmers to be counted) of C (phred33 ascii code 35) is given by
 
 ```julia
-julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/dir/ -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish
+julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence
 ```
 
 Only FASTQ files are acceptable input.
