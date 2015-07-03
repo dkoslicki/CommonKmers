@@ -397,8 +397,8 @@ Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_na
 #now for the 50mers
 temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms50/$(file_names[1])-50mers.bcalm.fa`);
 Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms50/$(file_names[x])-50mers.bcalm.fa`)),[1:num_files]);
-y30 = Y30/sum(Y30);
-y50 = Y50/sum(Y50);
+y30 = Y30/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-30mers.jf`))[6]); #divide by total number of kmers in sample
+y50 = Y50/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-50mers.jf`))[6]);
 
 #Make the hypothetical matrices (later, only do this for the basis elements)
 #30mers
@@ -444,12 +444,10 @@ blas_set_num_threads(length(workers()))
 #x = lsqnonneg(A_with_hypothetical, y);
 #timing = toc();
 
-#Perform the classification, sparsity promoting
-lambda=1000;
-basis=find(y30.>.001);
-y = float(vcat(y30[basis],y50[basis]));
+#Perform the classification, just lsqnonneg
+y = float(vcat(y30,y50));
 #tic();
-x=lsqnonneg([ones(1,size(A_with_hypothetical,2));lambda*A_with_hypothetical[vcat(basis,basis.+num_files),:]],[0;lambda*y]);
+x=lsqnonneg(A_with_hypothetical,y,.0005,3);
 #timing = toc();
 
 #Normalize the result
