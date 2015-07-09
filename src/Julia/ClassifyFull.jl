@@ -122,7 +122,7 @@ end
 # as the given taxonomy file) and outputs the classification in the CAMI format.
 # ==============================================================================
 
-function ConvertToCAMIOutputLCA(kind, input_file, taxonomy_file, output_file, hyp_threshes, common_kmer_matrix_normalized, sample_ID, contestant_ID)
+function ConvertToCAMIOutputLCA(kind, input_file, taxonomy_file, output_file, hyp_threshes, common_kmer_matrix_normalized, sample_ID)
 
 #Parse the args
 
@@ -275,9 +275,7 @@ output_file_handle = open(output_file,"w")
 
 #Write the header
 write(output_file_handle,"# CAMI Submission for Taxonomic Profiling\n")
-#write(output_file_handle, "@Task:Profiling\n")
 write(output_file_handle,"@Version:0.9.1\n")
-#write(output_file_handle,"@ContestantID:CONTESTANTID\n")
 write(output_file_handle,"@SampleID:$(sample_ID)\n")
 write(output_file_handle,"@Ranks: superkingdom|phylum|class|order|family|genus|species|strain\n")
 write(output_file_handle,"\n")
@@ -377,12 +375,21 @@ function parse_commandline()
 		"--query_per_sequence_binary", "-q"
 			help = "Location of the query_per_sequence binary. eg ~/bin/./query_per_sequence"
 			default = "query_per_sequence"
-		"--contestant_ID", "-c"
-			help = "Contestant ID"
-			default = "CONTESTANTID"
 		"--quality", "-Q"
 			help = "minimum per-base quality score required to include kmer"
 			default = "C"
+		"--common_kmer_30_filename"
+			help = "Base name of common kmer matrix for 30mers. Example: CommonKmerMatrix-30mers.h5. Only used if custom training data is used."
+			default = "RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-30mersC.h5"
+		"--common_kmer_50_filename:
+			help = "Base name of common kmer matrix for 50mers. Example: CommonKmerMatrix-50mers.h5. Only used if custom training data is used."
+			default = "RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-50mersC.h5"
+		"--FileNames"
+			help = "File containing the file names for each one of the training genomes. Example: FileNames.txt. Only used if custom training data is used."
+			default = "UniqueSpeciesFileNamesPruned.txt"
+		"--Taxonomy"
+			help = "Taxonomy file name for each one of the training genomes. Example: Taxonomy.txt. Only used if custom training data is used."
+			default = "UniqueSpeciesTaxonomyPruned.txt"
     end
     return parse_args(s)
 end
@@ -395,15 +402,18 @@ end
 @everywhere kind = parsed_args["kind"]
 @everywhere jellyfish_binary = parsed_args["jellyfish_binary"]
 @everywhere query_per_sequence_binary = parsed_args["query_per_sequence_binary"]
-@everywhere contestant_ID = parsed_args["contestant_ID"];
 @everywhere sample_ID = input_file_name
 @everywhere quality = parsed_args["quality"]
+@everywhere common_kmer_30_filename = parsed_args["common_kmer_30_filename"]
+@everywhere common_kmer_50_filename = parsed_args["common_kmer_50_filename"]
+@everywhere FileNames = parsed_args["FileNames"]
+@everywhere Taxonomy = parsed_args["Taxonomy"]
 
 #Set the input/output files
-@everywhere file_names_path = "$(data_dir)/UniqueSpeciesFileNamesPruned.txt";
-@everywhere taxonomy_file = "$(data_dir)/UniqueSpeciesTaxonomyPruned.txt";
-@everywhere A30_file = "$(data_dir)/RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-30mersC.h5";
-@everywhere A50_file = "$(data_dir)/RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-50mersC.h5";
+@everywhere file_names_path = "$(data_dir)/$(FileNames).txt";
+@everywhere taxonomy_file = "$(data_dir)/$(Taxonomy)";
+@everywhere A30_file = "$(data_dir)/$(common_kmer_30_filename)";
+@everywhere A50_file = "$(data_dir)/$(common_kmer_50_filename)";
 @everywhere x_file = "$(basename(input_file_name))_reconstruction.txt"
 @everywhere thresholds=[.90,.80,.70,.60,.50,.40,.30,.20,.10];
 @everywhere normalize = "y";
@@ -497,7 +507,7 @@ A_norm = A./diag(A)';
 
 
 if kind=="default" || kind=="specific" || kind=="sensitive"
-	ConvertToCAMIOutputLCA(kind, x_file, taxonomy_file, classification_file, thresholds, A_norm, sample_ID, contestant_ID)
+	ConvertToCAMIOutputLCA(kind, x_file, taxonomy_file, classification_file, thresholds, A_norm, sample_ID)
 else
 	error("Must choose one of the following output kinds for -k: default, specific, sensitive")
 end
