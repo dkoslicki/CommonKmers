@@ -81,7 +81,7 @@ All of these files must be placed in a directory (for example, called ``CommonKm
 
 Before getting started, create a file consisting of the base names of each of the training genomes, and save this to a file (for example, ``fileNames.txt``).
 
-####Creating custom taxonomy####
+####1. Creating custom taxonomy####
 For each genome in ``fileNames.txt`` (and in the same order), a taxonomy file must be created. This file MUST be a newline delimitated file with each line having the following format:
 ```bash
 <organismName>\t<TaxID>\t<TaxPath>
@@ -105,7 +105,7 @@ An example line is as follows:
 
 For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_taxid.py`` generates such a taxonomy using the NCBI taxonomy. This file must be placed in the ``CommonKmerTrainingData`` folder.
 
-####Create 30mer and 50mer jellyfish files####
+####2. Create 30mer and 50mer jellyfish files####
 For each genome in ``fileNames.txt``, 30mer and 50mer jellyfish files must be created. And example command to do this is:
 
 ```bash
@@ -114,7 +114,7 @@ cat fileNames.txt | xargs -I{} -P <num_threads> /path/to/jellyfish count {} -m <
 
 The resulting jellyfish files MUST begin with the corresponding ``fileNames.txt`` name, and end in ``-xmers.jf`` with x=30 or x=50. For example, a file might be ``G000022605.fna-30mers.bcalm.fa``.
 
-####Create common kmer matrices####
+####3. Create common kmer matrices####
 First, compile the ``/CommonKmers/src/CountInFile/count_in_file.cc`` code using a command like:
 
 ```bash
@@ -142,7 +142,7 @@ where:
 Note that you will need to do this for both the 30mers and the 50mers (so two ``<JellyfishFiles>`` will be needed, and two ``<Outfiles>`` will be created.
 The resulting files must be placed in the ``CommonKmerTrainingData`` folder.
 
-####Create bcalms for each 30mer jellyfish file####
+####4. Create bcalms for each 30mer jellyfish file####
 For each 30mer jellyfish file, you will need to create a Bcalm file. The Bcalm source code can [be found here](https://github.com/Malfoy/bcalm).
 
 The bcalm files can then be formed using:
@@ -172,7 +172,7 @@ mkdir /tmp/ramdisk; chmod 777 /tmp/ramdisk
 mount -t tmpfs -o size=100G tmpfs /tmp/ramdisk/
 ```
 
-####Run CommonKmers using the custom training data####
+####5. Run CommonKmers using the custom training data####
 After the above steps are completed, you can utilize the custom training data by calling the ``CommonKmers/src/Julia/ClassifyFull.jl`` script. An example follows:
 
 ```bash
