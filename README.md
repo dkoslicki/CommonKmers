@@ -70,12 +70,15 @@ For issues with this software, contact david.koslicki@math.oregonstate.edu
 
 ## Custom Training Databases ##
 If you wish to use a custom training database, the following steps must be performed:
+
 1. Create an acceptable taxonomy for the training databases.
 2. Create 30mer and 50mer jellyfish files for each training genome.
 3. Create common kmer matrices for the 30mers and 50mers.
 4. Create bcalms for each 30mer jellyfish file.
 5. Run CommonKmers using the custom training data.
+
 All of these files must be placed in a directory (for example, called ``CommonKmerTrainingData`` below).
+
 Before getting started, create a file consisting of the base names of each of the training genomes, and save this to a file (for example, ``fileNames.txt``).
 
 ###Creating custom taxonomy##
@@ -83,58 +86,87 @@ For each genome in ``fileNames.txt`` (and in the same order), a taxonomy file mu
 ```bash
 <organismName>\t<TaxID>\t<TaxPath>
 ```
+
 ``<organismName>`` must be a unique identifier for each genome.
+
 ``<TaxID>`` must be a unique TaxID for each genome
-``<TaxPath>`` must be a pipe delimitated list that gives the taxonomy of the given organism. The formate is: 
+
+``<TaxPath>`` must be a pipe delimitated list that gives the taxonomy of the given organism. The format is: 
+
 ```
 k__<KingdomTaxID>_<KingdomName>|p__<PhylumTaxID>_<PhylumName>|c__<ClassTaxID>_<ClassName>|o__<OrderTaxID>_<OrderName>|f__<FamilyTaxID>_<FamilyName>|g__<GenusTaxID>_<GenusName>|s__<SpeciesTaxID>_<SpeciesName>|t__<StrainTaxID>_<StrainName>
 ```
+
 An example line is as follows:
+
 ```
 1184607_Austwickia_chelonae_NBRC_105200	1184607	k__2_Bacteria|p__201174_Actinobacteria|c__1760_Actinobacteria|o__2037_Actinomycetales|f__85018_Dermatophilaceae|g__1184606_Austwickia|s__100225_Austwickia_chelonae|t__1184607_Austwickia_chelonae_NBRC_105200
 ```
-For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_taxid.py`` generates such a taxonomy using the NCBI taxonomy.
-This file must be placed in the ``CommonKmerTrainingData`` folder.
+
+For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_taxid.py`` generates such a taxonomy using the NCBI taxonomy. This file must be placed in the ``CommonKmerTrainingData`` folder.
 
 ###Create 30mer and 50mer jellyfish files###
 For each genome in ``fileNames.txt``, 30mer and 50mer jellyfish files must be created. And example command to do this is:
+
 ```bash
 cat fileNames.txt | xargs -I{} -P <num_threads> /path/to/jellyfish count {} -m <kmer_size> -t 1 -s 100M -C -o /counts/{}-30mers.jf
 ```
+
 The resulting jellyfish files MUST begin with the corresponding ``fileNames.txt`` name, and end in ``-xmers.jf`` with x=30 or x=50. For example, a file might be ``G000022605.fna-30mers.bcalm.fa``.
 
 ###Create common kmer matrices###
 First, compile the ``/CommonKmers/src/CountInFile/count_in_file.cc`` code using a command like:
+
 ```bash
 g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.0/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.0/.libs count_in_file.cc -o count_in_file
 ```
+
 Next, for the common kmer matrix using:
+
 ```bash
 	julia -p <NumThreads> CommonKmers/src/Julia/FormTrainingMatrix.jl -i <JellyfishFiles> -o <OutFile> -c <count_in_file_binary> -s <chunk_size>
 ```
+
 where:
+
 ``<NumThreads>`` is the number of threads to run.
+
 ``<JellyfishFiles>`` is a list of the full paths to the 30mers or 50mers jellyfish files (in the same order as ``fileNames.txt``).
+
 ``<Outfile>`` is the output 30mer common kmer matrix or 50mer common kmer matrix. You will need to place it in the ``CommonKmerTrainingData`` directory.
+
 ``<count_in_file_binary>`` is the location of the ``count_in_file_binary`` binary created previously.
+
 ``<chunk_size>`` is optional, but depends on the amount of RAM available. I have found that a value of approximately 700 is acceptable with 256GB of RAM. Specifying this is optional.
+
 Note that you will need to do this for both the 30mers and the 50mers (so two ``<JellyfishFiles>`` will be needed, and two ``<Outfiles>`` will be created.
 The resulting files must be placed in the ``CommonKmerTrainingData`` folder.
 
 ###Create bcalms for each 30mer jellyfish file###
 For each 30mer jellyfish file, you will need to create a Bcalm file. The Bcalm source code can [be found here](https://github.com/Malfoy/bcalm).
+
 The bcalm files can then be formed using:
+
 ```bash
 julia -p <NumThreads> CommonKmers/src/Julia/FormBcalms.jl -i <FileNames> -c <LocationOf30merJellyfishFiles> -o <OutputFolder> -b <BcalmBinaryLocation> -j <JellyfishBinaryLocation> -r <RamdiskOrSSDLocation>
 ```
+
 where:
+
 ``<NumThreads>`` is the number of threads to run.
+
 ``<FileNames>`` is the file ``fileNames.txt`` referred to above (base names of each of the training genomes).
+
 ``<LocationOf30merJellyfishFiles>`` is the location of the 30mer jellyfish files. Recall that these MUST be named like: ``<LocationOf30merJellyfishFiles>/<FileName>-30mers.jf``.
+
 ``<OutputFolder>`` MUST be the directory ``CommonKmersData/Bcalms/``.
+
 ``<BcalmBinaryLocation>`` is the location of the previously compiled code (eg. ``path/to/./count_in_file``).
+
 ``<JellyfishBinaryLocation>`` is the location of the jellyfish binary (eg. ``path/to/bin/jellyfish``).
+
 ``<RamdiskOrSSDLocation>`` is the location of a RAM disk or SSD (or other fast storage device. Unfortunately Bcalm uses a considerable amount of file IO, and so a fast storage device is required. Note that you can create a RAM disk using a command like:
+
 ```bash
 mkdir /tmp/ramdisk; chmod 777 /tmp/ramdisk
 mount -t tmpfs -o size=100G tmpfs /tmp/ramdisk/
@@ -142,9 +174,11 @@ mount -t tmpfs -o size=100G tmpfs /tmp/ramdisk/
 
 ###Run CommonKmers using the custom training data###
 After the above steps are completed, you can utilize the custom training data by calling the ``CommonKmers/src/Julia/ClassifyFull.jl`` script. An example follows:
+
 ```bash
 julia -p 48 ClassifyFull.jl -d <CustomDataPath> -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence --common_kmer_30_filename CommonKmers-30mers.h5 --common_kmer_50_filename CommonKmers-50mers.h5 --FileNames fileNames.txt --Taxonomy Taxonomy.txt
 ```
+
 Where the files ``CommonKmers-30mers.h5``, ``CommonKmers-50mers.h5``, ``fileNames.txt``, and ``Taxonomy.txt`` (along with the folder ``Bcalms``) exist in the folder ``<CustomDataPath>`` (referred to above as the ``CommonKmerTrainingData``).
 
 
