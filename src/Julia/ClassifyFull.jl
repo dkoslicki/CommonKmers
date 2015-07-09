@@ -1,8 +1,16 @@
 using HDF5
 using ArgParse
 
+# ==============================================================================
+# lsqnonneg
+#
+# Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
+#
+# Based on the lsqnonneg MATLAB function. Implements the Lawson & Hanson, 1974
+# algorithm for non-negative least squares.
+# ==============================================================================
 
-function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
+function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3, ChangeX::Real=.0001)
 	#set the tolerance
 	(m,n) = size(C);
 	tol = (tol == -1) ? tol = 10*eps()*norm(C,1)*(maximum(size(C))+1) : tol
@@ -68,6 +76,8 @@ function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
 			
 			# Find indices where intermediate solution z is approximately negative
 			Q = [(z .<= 0) & P];
+			
+			xold=[x];
 
 			# Choose new x subject to keeping new x nonnegative
 			alpha = minimum(x[Q]./(x[Q] - z[Q]));
@@ -78,21 +88,33 @@ function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3)
 			P = ~Z;
 			z = zeros(n,1);           # Reset z
 			z[P] = C[:,find(P)]\d;      # Re-solve for z
+			
+			#If change in x is small enough, break
+			if norm(x-xold,1)<ChangeX
+				x = z;
+				lambda = w;
+				return x
+			end
 		end
-
+		xold = [x];
 		x = z;
 
         dtemp=d[:];
         BLAS.gemv!('N',-1.,C,x[:],1.,dtemp); #resid = d - C*x;
         w=BLAS.gemv('N',1.,Ctrans, dtemp); #w = Ctrans*resid;
+        
+        print("Change in x: $(norm(x-xold,1))\n")
+        #If change in x is small enough, break
+        if norm(x-xold,1)<ChangeX
+        	return x
+        end
 
 	end
 	return x
 end
 
-
 # ==============================================================================
-# ConvertToCAMIOutputLCA.jl
+# ConvertToCAMIOutputLCA
 #
 # Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
 #
@@ -325,7 +347,14 @@ close(output_file_handle)
 
 end
 
-
+# ==============================================================================
+# ClassifyFull
+#
+# Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
+#
+# Performs the classification. For more information on usage, see the homepage: 
+# https://github.com/dkoslicki/CommonKmers
+# ==============================================================================
 
 
 #Parse arguments
@@ -392,11 +421,11 @@ run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100
 close(fid);
 @everywhere num_files = length(file_names);
 #do it once to read the jf and bcalms into memory
-temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms50/$(file_names[1])-50mers.bcalm.fa`);
-Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms50/$(file_names[x])-50mers.bcalm.fa`)),[1:num_files]);
+temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
+Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
 #now for the 50mers
-temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms50/$(file_names[1])-50mers.bcalm.fa`);
-Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms50/$(file_names[x])-50mers.bcalm.fa`)),[1:num_files]);
+temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
+Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
 y30 = Y30/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-30mers.jf`))[6]); #divide by total number of kmers in sample
 y50 = Y50/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-50mers.jf`))[6]);
 
@@ -436,19 +465,21 @@ A_with_hypothetical50 = hcat(A_norm, hypothetical_matrix);
 #together
 A_with_hypothetical = vcat(A_with_hypothetical30, A_with_hypothetical50);
 
-
-#perform the classification, non-restriction and non-sparsity promoting.
 #set BLAS threads
 blas_set_num_threads(length(workers()))
-#tic();
-#x = lsqnonneg(A_with_hypothetical, y);
-#timing = toc();
 
-#Perform the classification, just lsqnonneg
-y = float(vcat(y30,y50));
-#tic();
-x=lsqnonneg(A_with_hypothetical,y,.0005,3);
-#timing = toc();
+#Perform the classification, just lsqnonneg, reduce basis
+basis=find(y30.>.0001);
+y = float(vcat(y30[basis],y50[basis]));
+column_basis=int64(vcat(basis,[basis[j].+i*num_files for i=1:length(thresholds), j=1:length(basis)]'[:])); #this is the basis expanded to include the hypothetical organisms
+xtemp=lsqnonneg(A_with_hypothetical[vcat(basis,basis.+num_files),column_basis],y,.0005,3,.000001); #Added change in x term
+
+#create vector on full basis
+x = zeros(num_files*(length(thresholds)+1));
+#populate with the reconstructed frequencies
+for i=1:length(xtemp)
+	x[column_basis[i]] = xtemp[i];
+end
 
 #Normalize the result
 x=x/sum(x);

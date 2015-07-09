@@ -48,7 +48,7 @@ docker run --rm -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:
 In the input folder must be a collection of gzipped FASTQ (not FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
 Here ``[type]`` is one of ``default, sensitive, specific``.
 The ``--rm`` flag deletes temporary files after exit (otherwise they might persist in ``/var/lib/docker/volumes`` or the like).
-If the environmental variable ``QUALITY`` is not passed to docker (via ``-e QUALITY=<ascii character>``, a default value of "C" will be used. 
+If the environmental variable ``QUALITY`` is not passed to docker (via ``-e QUALITY=<ascii character>``), a default value of "C" will be used. 
 
 
 
@@ -75,7 +75,7 @@ file for more details.
 
 
 ## Contributors ##
-+ David Koslicki
-+ Daniel Alonso Alemany
++ David Koslicki (all main source code)
++ Daniel Alonso Alemany (early version of the software)
 + Daniel Falush
 + Nam Nguyen
