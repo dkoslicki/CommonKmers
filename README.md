@@ -65,8 +65,7 @@ awk '{if(NR%4==2){gsub(/[^ACGT]/,"N");print $0}else{print $0}}' input.fq > input
 /Fastx/bin/./fastx_quality_stats -i input_ACTGN.fq -Q33 | cut -f7 | sed -n '1!p' | awk '{a+=$1} END{print a/NR}' | awk '{printf "%.0f",$1}'
 ```
 The FastX toolbox can be downloaded [here](http://hannonlab.cshl.edu/fastx_toolkit/).
-## Contact ##
-For issues with this software, contact david.koslicki@math.oregonstate.edu
+
 
 ## Custom Training Databases ##
 If you wish to use a custom training database, the following steps must be performed:
@@ -181,7 +180,8 @@ julia -p 48 ClassifyFull.jl -d <CustomDataPath> -o /path/to/output/file.profile 
 
 Where the files ``CommonKmers-30mers.h5``, ``CommonKmers-50mers.h5``, ``fileNames.txt``, and ``Taxonomy.txt`` (along with the folder ``Bcalms``) exist in the folder ``<CustomDataPath>`` (referred to above as the ``CommonKmerTrainingData``).
 
-
+## Contact ##
+For issues with this software, contact david.koslicki@math.oregonstate.edu
 
 ## License ##
 This project is released under the GPL-3 License. Please view the [LICENSE](LICENSE)
