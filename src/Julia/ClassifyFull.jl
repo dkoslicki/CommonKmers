@@ -381,7 +381,7 @@ function parse_commandline()
 		"--common_kmer_30_filename"
 			help = "Base name of common kmer matrix for 30mers. Example: CommonKmerMatrix-30mers.h5. Only used if custom training data is used."
 			default = "RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-30mersC.h5"
-		"--common_kmer_50_filename:
+		"--common_kmer_50_filename"
 			help = "Base name of common kmer matrix for 50mers. Example: CommonKmerMatrix-50mers.h5. Only used if custom training data is used."
 			default = "RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-50mersC.h5"
 		"--FileNames"
