@@ -1,5 +1,5 @@
 # ==============================================================================
-# FormTrainingData.jl
+# Train.jl
 #
 # Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
 #
