@@ -5,7 +5,7 @@
 #
 # Forms the training data required for the CommonKmers method.
 # ==============================================================================
-# Call with something like: julia -p 3 Train.jl -i FullFileNames.txt -o ../Output/ -b /nfs1/Koslicki_Lab/koslickd/Bcalm/bcalm/./bcalm -r ../Temp/ -j /nfs1/Koslicki_Lab/koslickd/jellyfish-2.2.0/bin/jellyfish -c ./count_in_file
+# Call with something like: julia -p 3 Train.jl -i FullFileNames.txt -o ../Output/ -b /nfs1/Koslicki_Lab/koslickd/Bcalm/bcalm/./bcalm -r /data/temp/ -j /nfs1/Koslicki_Lab/koslickd/jellyfish-2.2.0/bin/jellyfish -c ./count_in_file
 using HDF5
 using ArgParse
 
@@ -85,6 +85,14 @@ close(fid)
 @everywhere full_file_names = split(readall(fid))
 close(fid)
 
+#Write the basenames to the training directory
+fid = open("$(output_folder)/FileNames.txt","w")
+for i=1:length(file_names)
+	write(fid,"$(file_names[i])\n")
+end
+
+
+
 #Form the kmer counts
 if isdir("$(output_folder)/Counts")
 	rm("$(output_folder)/Counts", recursive=true)
@@ -109,8 +117,8 @@ for kmer_size=[30;50]
 		for i = 1:chunk_size:num_files
 			#only do the subdiagonal
 			if i>=j
-				tic()
-				print("On (row,column) chunk: ($(i),$(j)) of $(num_files)\n")
+				#tic()
+				#print("On (row,column) chunk: ($(i),$(j)) of $(num_files)\n")
 				#parallelize over the chunk
 				@sync begin
 				@parallel for ii = i:i+chunk_size-1
@@ -125,7 +133,7 @@ for kmer_size=[30;50]
 					end
 				end
 				end
-				toc()
+				#toc()
 				gc()
 			end
 		end

@@ -378,18 +378,6 @@ function parse_commandline()
 		"--quality", "-Q"
 			help = "minimum per-base quality score required to include kmer"
 			default = "C"
-		"--common_kmer_30_filename"
-			help = "Base name of common kmer matrix for 30mers. Example: CommonKmerMatrix-30mers.h5. Only used if custom training data is used."
-			default = "RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-30mersC.h5"
-		"--common_kmer_50_filename"
-			help = "Base name of common kmer matrix for 50mers. Example: CommonKmerMatrix-50mers.h5. Only used if custom training data is used."
-			default = "RepoPhlAn-12-20-14-UniqueSpeciesPruned-CommonKmerMatrix-50mersC.h5"
-		"--FileNames"
-			help = "File containing the file names for each one of the training genomes. Example: FileNames.txt. Only used if custom training data is used."
-			default = "UniqueSpeciesFileNamesPruned.txt"
-		"--Taxonomy"
-			help = "Taxonomy file name for each one of the training genomes. Example: Taxonomy.txt. Only used if custom training data is used."
-			default = "UniqueSpeciesTaxonomyPruned.txt"
     end
     return parse_args(s)
 end
@@ -404,16 +392,17 @@ end
 @everywhere query_per_sequence_binary = parsed_args["query_per_sequence_binary"]
 @everywhere sample_ID = input_file_name
 @everywhere quality = parsed_args["quality"]
-@everywhere common_kmer_30_filename = parsed_args["common_kmer_30_filename"]
-@everywhere common_kmer_50_filename = parsed_args["common_kmer_50_filename"]
-@everywhere FileNames = parsed_args["FileNames"]
-@everywhere Taxonomy = parsed_args["Taxonomy"]
+
 
 #Set the input/output files
-@everywhere file_names_path = "$(data_dir)/$(FileNames).txt";
-@everywhere taxonomy_file = "$(data_dir)/$(Taxonomy)";
-@everywhere A30_file = "$(data_dir)/$(common_kmer_30_filename)";
-@everywhere A50_file = "$(data_dir)/$(common_kmer_50_filename)";
+@everywhere file_names_path = "$(data_dir)/FileNames.txt";
+@everywhere taxonomy_file = "$(data_dir)/Taxonomy.txt";
+#Make sure they included a taxonomy file
+if not(isfile(taxonomy_file))
+	error("Missing taxonomy file: $(data_dir)/Taxonomy.txt")
+end
+@everywhere A30_file = "$(data_dir)/CommonKmerMatrix-30mers.h5";
+@everywhere A50_file = "$(data_dir)/CommonKmerMatrix-50mers.h5";
 @everywhere x_file = "$(basename(input_file_name))_reconstruction.txt"
 @everywhere thresholds=[.90,.80,.70,.60,.50,.40,.30,.20,.10];
 @everywhere normalize = "y";
@@ -437,7 +426,7 @@ Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_na
 temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
 Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
 y30 = Y30/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-30mers.jf`))[6]); #divide by total number of kmers in sample
-y50 = Y50/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-50mers.jf`))[6]);
+y50 = Y50/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-50mers.jf`))[6]); #divide by total number of kmers in sample
 
 #Make the hypothetical matrices (later, only do this for the basis elements)
 #30mers
@@ -457,7 +446,7 @@ end
 # real plus hypothetical
 A_with_hypothetical30 = hcat(A_norm, hypothetical_matrix);
 #50mers
-A = float(h5read(A50_file,"/common_kmers"))'; 
+A = float(h5read(A50_file,"/common_kmers"))'; #Check this with the new training data##############
 A_norm = A./diag(A)';
 #Create hypothetical organisms
 thresholds=thresholds.^1.5;
@@ -502,7 +491,7 @@ end
 close(fid)
 
 #Convert to CAMI format, use 30mer matrix to do the LCA
-A = float(h5read(A30_file,"/common_kmers"))'; #This was before I was transposing everything
+A = float(h5read(A30_file,"/common_kmers"))'; #Check this with the new training data##############
 A_norm = A./diag(A)';
 
 

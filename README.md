@@ -70,18 +70,14 @@ The FastX toolbox can be downloaded [here](http://hannonlab.cshl.edu/fastx_toolk
 ## Custom Training Databases ##
 If you wish to use a custom training database, the following steps must be performed:
 
-1. Create an acceptable taxonomy for the training databases.
-2. Create 30mer and 50mer jellyfish files for each training genome.
-3. Create common kmer matrices for the 30mers and 50mers.
-4. Create bcalms for each 30mer jellyfish file.
-5. Run CommonKmers using the custom training data.
+1. Create a directory to contain the training data (called ``CommonKmerTrainingData`` below).
+2. Create an acceptable taxonomy for the training genomes, and place it in the ``CommonKmerTrainingData`` folder.
+3. Create a file consisting of the full paths of the training genomes, and save this to a file (for example, ``FileNames.txt``).
+4. Compile the code contained in ``CommonKmers/src/CountInFile/``.
+5. Run the script ``Train.jl``.
 
-All of these files must be placed in a directory (for example, called ``CommonKmerTrainingData`` below).
-
-Before getting started, create a file consisting of the base names of each of the training genomes, and save this to a file (for example, ``fileNames.txt``).
-
-####1. Creating custom taxonomy####
-For each genome in ``fileNames.txt`` (and in the same order), a taxonomy file must be created. This file MUST be a newline delimitated file with each line having the following format:
+####Creating custom taxonomy####
+For each genome in ``FileNames.txt`` (and in the same order), a taxonomy file must be created. This file MUST be a newline delimitated file with each line having the following format:
 ```bash
 <organismName>\t<TaxID>\t<TaxPath>
 ```
@@ -104,82 +100,31 @@ An example line is as follows:
 
 For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_taxid.py`` generates such a taxonomy using the NCBI taxonomy. This file must be placed in the ``CommonKmerTrainingData`` folder.
 
-####2. Create 30mer and 50mer jellyfish files####
-For each genome in ``fileNames.txt``, 30mer and 50mer jellyfish files must be created. And example command to do this is:
-
-```bash
-cat fileNames.txt | xargs -I{} -P <num_threads> /path/to/jellyfish count {} -m <kmer_size> -t 1 -s 100M -C -o /counts/{}-30mers.jf
-```
-
-The resulting jellyfish files MUST begin with the corresponding ``fileNames.txt`` name, and end in ``-xmers.jf`` with x=30 or x=50. For example, a file might be ``G000022605.fna-30mers.bcalm.fa``.
-
-####3. Create common kmer matrices####
-First, compile the ``/CommonKmers/src/CountInFile/count_in_file.cc`` code using a command like:
+####Compile the ``count_in_file`` code####
+The ``/CommonKmers/src/CountInFile/count_in_file.cc`` code can be compiled using a command like:
 
 ```bash
 g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.0/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.0/.libs count_in_file.cc -o count_in_file
 ```
 
-Next, for the common kmer matrix using:
-
+####Run the script ``Train.jl``####
+The script ``Train.jl`` can be called using a command such as:
 ```bash
-	julia -p <NumThreads> CommonKmers/src/Julia/FormTrainingMatrix.jl -i <JellyfishFiles> -o <OutFile> -c <count_in_file_binary> -s <chunk_size>
+julia -p 48 Train.jl -i FullFileNames.txt -o /path/to/CommonKmerTrainingData/ -b /path/to/./bcalm -r /path/to/fast/IO/device/ -j /path/to/jellyfish -c /path/to./count_in_file -s 500 -t 20
 ```
 
-where:
+The option ``-s`` specifies how many training genomes at a time are held in memory. Increasing/decreasing this increases/decreases the amount of RAM used.
 
-``<NumThreads>`` is the number of threads to run.
+The option ``-t`` specifies how many jellyfish instances are created. Too many will cause disk thrashing (default is 20).
 
-``<JellyfishFiles>`` is a list of the full paths to the 30mers or 50mers jellyfish files (in the same order as ``fileNames.txt``).
-
-``<Outfile>`` is the output 30mer common kmer matrix or 50mer common kmer matrix. You will need to place it in the ``CommonKmerTrainingData`` directory.
-
-``<count_in_file_binary>`` is the location of the ``count_in_file_binary`` binary created previously.
-
-``<chunk_size>`` is optional, but depends on the amount of RAM available. I have found that a value of approximately 700 is acceptable with 256GB of RAM. Specifying this is optional.
-
-Note that you will need to do this for both the 30mers and the 50mers (so two ``<JellyfishFiles>`` will be needed, and two ``<Outfiles>`` will be created.
-The resulting files must be placed in the ``CommonKmerTrainingData`` folder.
-
-####4. Create bcalms for each 30mer jellyfish file####
-For each 30mer jellyfish file, you will need to create a Bcalm file. The Bcalm source code can [be found here](https://github.com/Malfoy/bcalm).
-
-The bcalm files can then be formed using:
-
-```bash
-julia -p <NumThreads> CommonKmers/src/Julia/FormBcalms.jl -i <FileNames> -c <LocationOf30merJellyfishFiles> -o <OutputFolder> -b <BcalmBinaryLocation> -j <JellyfishBinaryLocation> -r <RamdiskOrSSDLocation>
-```
-
-where:
-
-``<NumThreads>`` is the number of threads to run.
-
-``<FileNames>`` is the file ``fileNames.txt`` referred to above (base names of each of the training genomes).
-
-``<LocationOf30merJellyfishFiles>`` is the location of the 30mer jellyfish files. Recall that these MUST be named like: ``<LocationOf30merJellyfishFiles>/<FileName>-30mers.jf``.
-
-``<OutputFolder>`` MUST be the directory ``CommonKmersData/Bcalms/``.
-
-``<BcalmBinaryLocation>`` is the location of the previously compiled code (eg. ``path/to/./count_in_file``).
-
-``<JellyfishBinaryLocation>`` is the location of the jellyfish binary (eg. ``path/to/bin/jellyfish``).
-
-``<RamdiskOrSSDLocation>`` is the location of a RAM disk or SSD (or other fast storage device. Unfortunately Bcalm uses a considerable amount of file IO, and so a fast storage device is required. Note that you can create a RAM disk using a command like:
+The option ``-r`` specifics the location of a temporary folder on a fast IO device. Unfortunately Bcalm uses a considerable amount of file IO, and so a fast storage device is required. Note that you can create a RAM disk using a command like:
 
 ```bash
 mkdir /tmp/ramdisk; chmod 777 /tmp/ramdisk
 mount -t tmpfs -o size=100G tmpfs /tmp/ramdisk/
 ```
-
-####5. Run CommonKmers using the custom training data####
-After the above steps are completed, you can utilize the custom training data by calling the ``CommonKmers/src/Julia/ClassifyFull.jl`` script. An example follows:
-
-```bash
-julia -p 48 ClassifyFull.jl -d <CustomDataPath> -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence --common_kmer_30_filename CommonKmers-30mers.h5 --common_kmer_50_filename CommonKmers-50mers.h5 --FileNames fileNames.txt --Taxonomy Taxonomy.txt
-```
-
-Where the files ``CommonKmers-30mers.h5``, ``CommonKmers-50mers.h5``, ``fileNames.txt``, and ``Taxonomy.txt`` (along with the folder ``Bcalms``) exist in the folder ``<CustomDataPath>`` (referred to above as the ``CommonKmerTrainingData``).
-
+####Run the ``Classify.jl`` script####
+You can now run the ``Classify.jl`` script as before, but this time utilizing the directory ``CommonKmerTrainingData`` for the option ``-d``.
 ## Contact ##
 For issues with this software, contact david.koslicki@math.oregonstate.edu
 
