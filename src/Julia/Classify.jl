@@ -446,7 +446,7 @@ end
 # real plus hypothetical
 A_with_hypothetical30 = hcat(A_norm, hypothetical_matrix);
 #50mers
-A = float(h5read(A50_file,"/common_kmers"))'; #Check this with the new training data##############
+A = float(h5read(A50_file,"/common_kmers"))'; 
 A_norm = A./diag(A)';
 #Create hypothetical organisms
 thresholds=thresholds.^1.5;
@@ -491,7 +491,7 @@ end
 close(fid)
 
 #Convert to CAMI format, use 30mer matrix to do the LCA
-A = float(h5read(A30_file,"/common_kmers"))'; #Check this with the new training data##############
+A = float(h5read(A30_file,"/common_kmers"))'; 
 A_norm = A./diag(A)';
 
 
