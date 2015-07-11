@@ -103,7 +103,7 @@ function lsqnonneg(C::Matrix, d::Vector, tol::Real=-1, itmax_factor::Real=3, Cha
         BLAS.gemv!('N',-1.,C,x[:],1.,dtemp); #resid = d - C*x;
         w=BLAS.gemv('N',1.,Ctrans, dtemp); #w = Ctrans*resid;
         
-        print("Change in x: $(norm(x-xold,1))\n")
+        #print("Change in x: $(norm(x-xold,1))\n")
         #If change in x is small enough, break
         if norm(x-xold,1)<ChangeX
         	return x
