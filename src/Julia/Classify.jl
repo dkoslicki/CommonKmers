@@ -346,7 +346,7 @@ close(output_file_handle)
 end
 
 # ==============================================================================
-# ClassifyFull
+# Classify
 #
 # Authors: David Koslicki (david.koslicki@math.oregonstate.edu)
 #

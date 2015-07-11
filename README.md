@@ -35,7 +35,7 @@ docker build -t username/imagename .
 To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads and a minimum quality score (for kmers to be counted) of C (phred33 ascii code 35) is given by
 
 ```julia
-julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence
+julia -p 48 Classify.jl -d /path/to/CommonKmersData/ -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence
 ```
 
 Only FASTQ files are acceptable input.
@@ -92,6 +92,8 @@ For each genome in ``FileNames.txt`` (and in the same order), a taxonomy file mu
 k__<KingdomTaxID>_<KingdomName>|p__<PhylumTaxID>_<PhylumName>|c__<ClassTaxID>_<ClassName>|o__<OrderTaxID>_<OrderName>|f__<FamilyTaxID>_<FamilyName>|g__<GenusTaxID>_<GenusName>|s__<SpeciesTaxID>_<SpeciesName>|t__<StrainTaxID>_<StrainName>
 ```
 
+The taxonomy is only required at the kingdom level, with lower levels being optional.
+
 An example line is as follows:
 
 ```
@@ -110,7 +112,7 @@ g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jel
 ####Run the script ``Train.jl``####
 The script ``Train.jl`` can be called using a command such as:
 ```bash
-julia -p 48 Train.jl -i FullFileNames.txt -o /path/to/CommonKmerTrainingData/ -b /path/to/./bcalm -r /path/to/fast/IO/device/ -j /path/to/jellyfish -c /path/to./count_in_file -s 500 -t 20
+julia -p 48 Train.jl -i FullFileNames.txt -o /path/to/output/CommonKmerTrainingData/ -b /path/to/./bcalm -r /path/to/fast/IO/device/ -j /path/to/jellyfish -c /path/to./count_in_file -s 500 -t 20
 ```
 
 The option ``-s`` specifies how many training genomes at a time are held in memory. Increasing/decreasing this increases/decreases the amount of RAM used.
