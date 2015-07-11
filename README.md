@@ -31,7 +31,7 @@ docker build -t username/imagename .
 
 
 ## Running the program ##
-###From the command line###
+####From the command line####
 To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads and a minimum quality score (for kmers to be counted) of C (phred33 ascii code 35) is given by
 
 ```julia
@@ -40,7 +40,7 @@ julia -p 48 ClassifyFull.jl -d /path/to/CommonKmersData/ -o /path/to/output/file
 
 Only FASTQ files are acceptable input.
 
-###Using Docker###
+####Using Docker####
 To run the tool from docker, mount the appropriate folders and run using the following command:
 ```bash
 docker run --rm -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
