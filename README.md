@@ -125,6 +125,8 @@ The option ``-r`` specifics the location of a temporary folder on a fast IO devi
 mkdir /tmp/ramdisk; chmod 777 /tmp/ramdisk
 mount -t tmpfs -o size=100G tmpfs /tmp/ramdisk/
 ```
+
+Note that the time required to complete the training step can be considerable (depending on hardware available). Using 48 cores and 256GB of RAM, training on ~7,000 genomes can take upwards of a week.
 ####Run the ``Classify.jl`` script####
 You can now run the ``Classify.jl`` script as before, but this time utilizing the directory ``CommonKmerTrainingData`` for the option ``-d``.
 ## Contact ##
