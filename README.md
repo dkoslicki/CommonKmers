@@ -11,7 +11,7 @@ CommonKmers is a k-mer based bacterial community reconstruction technique that u
 ###Build from source###
 You will need the Kmer counting tool Jellyfish to be installed. Please see [the Jellyfish installation page](http://www.genome.umd.edu/jellyfish.html) for installation directions.
 
-You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz). Place this file in the CommonKmers directory, and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
+You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
 
 Please refer to [the Julia installation page](http://julialang.org/downloads/) to install Julia.
 You will need to add the HDF5 and ArgParse packages. These can be added using `Pkg.add("HDF5")` and `Pkg.add("ArgParse")`.
@@ -23,6 +23,8 @@ g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jel
 
 ###Using Docker###
 A Dockerfile is included in this repository. See the [Docker homepage](https://www.docker.com/) for more information.
+
+You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
 
 You can build the docker image by cloning the repository, starting Docker, and then in the ``CommonKmers/Docker`` folder, using the command:
 ```bash 
