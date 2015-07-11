@@ -111,6 +111,7 @@ pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 30 -t 1 -s 100M
 pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 50 -t 1 -s 100M -C -o $(output_folder)/Counts/$(file_names[x])-50mers.jf`),[1:num_files],workers_to_use);
 
 #Form the CommonKmer matrix
+#This will need to be refined after moving to count_in_file. Specifically, we should go row by row, and parallelize over columns. Due to the @sync, given a slow row, this can severely slow down the whole process
 for kmer_size=[30;50]
 	CommonKmersMatrix = SharedArray(Int64, (num_files,num_files), init=0);
 	for j = 1:chunk_size:num_files

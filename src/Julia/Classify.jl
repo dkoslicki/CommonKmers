@@ -398,7 +398,7 @@ end
 @everywhere file_names_path = "$(data_dir)/FileNames.txt";
 @everywhere taxonomy_file = "$(data_dir)/Taxonomy.txt";
 #Make sure they included a taxonomy file
-if not(isfile(taxonomy_file))
+if ~isfile(taxonomy_file)
 	error("Missing taxonomy file: $(data_dir)/Taxonomy.txt")
 end
 @everywhere A30_file = "$(data_dir)/CommonKmerMatrix-30mers.h5";
