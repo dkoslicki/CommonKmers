@@ -376,8 +376,17 @@ function parse_commandline()
 			help = "Location of the query_per_sequence binary. eg ~/bin/./query_per_sequence"
 			default = "query_per_sequence"
 		"--quality", "-Q"
-			help = "minimum per-base quality score required to include kmer"
+			help = "Minimum per-base quality score required to include kmer"
 			default = "C"
+		"--save_y"
+			help = "Use this flag if you want the output y vectors to be saved (to re-run with different -kind option much quicker). Files will automatically be stored in the output directory with the file name input_file_name-y30.txt and input_file_name-y50.txt"
+			action = :store_true
+		"--re_run"
+			help = "This flag indicated that y vectors have already been saved. Looks for input_file_name-y30.txt and input_file_name-y50.txt in the output_directory"
+			action = :store_true
+		"--normalize"
+			help = "Normalize the profile to sum to 1"
+			action = :store_true
     end
     return parse_args(s)
 end
@@ -392,6 +401,9 @@ end
 @everywhere query_per_sequence_binary = parsed_args["query_per_sequence_binary"]
 @everywhere sample_ID = input_file_name
 @everywhere quality = parsed_args["quality"]
+@everywhere save_y = parsed_args["save_y"]
+@everywhere re_run = parsed_args["re_run"]
+@everywhere normalize = parsed_args["normalize"]
 
 
 #Set the input/output files
@@ -405,28 +417,48 @@ end
 @everywhere A50_file = "$(data_dir)/CommonKmerMatrix-50mers.h5";
 @everywhere x_file = "$(basename(input_file_name))_reconstruction.txt"
 @everywhere thresholds=[.90,.80,.70,.60,.50,.40,.30,.20,.10];
-@everywhere normalize = "y";
 #@everywhere classification_file = "$(output_dir)/$(basename(input_file_name))_CommonKmers_classification.txt"
 @everywhere classification_file = output_file;
 @everywhere num_threads = length(workers());
-
-#form the jf files
-run(`$(jellyfish_binary) count $(input_file_name) -m 30 -t $(num_threads) -s 100M -C -Q $(quality) -o $(basename(input_file_name))-30mers.jf`);
-run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100M -C -Q $(quality) -o $(basename(input_file_name))-50mers.jf`);
 
 #Form the Y functions
 @everywhere fid = open(file_names_path,"r");
 @everywhere file_names = split(readall(fid));
 close(fid);
 @everywhere num_files = length(file_names);
-#do it once to read the jf and bcalms into memory
-temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
-Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
-#now for the 50mers
-temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
-Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
-y30 = Y30/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-30mers.jf`))[6]); #divide by total number of kmers in sample
-y50 = Y50/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-50mers.jf`))[6]); #divide by total number of kmers in sample
+
+if re_run & isfile("$(dirname(output_file))/$(basename(input_file_name))-y30.txt") & isfile("$(dirname(output_file))/$(basename(input_file_name))-y50.txt")
+	fid = open("$(dirname(output_file))/$(basename(input_file_name))-y30.txt","r")
+	y30 = float(split(readall(fid)));
+	close(fid)
+	fid = open("$(dirname(output_file))/$(basename(input_file_name))-y50.txt","r")
+	y50 = float(split(readall(fid)));
+	close(fid)
+else
+	#form the jf files
+	run(`$(jellyfish_binary) count $(input_file_name) -m 30 -t $(num_threads) -s 100M -C -Q $(quality) -o $(basename(input_file_name))-30mers.jf`);
+	run(`$(jellyfish_binary) count $(input_file_name) -m 50 -t $(num_threads) -s 100M -C -Q $(quality) -o $(basename(input_file_name))-50mers.jf`);
+	#do it once to read the jf and bcalms into memory
+	temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
+	Y30 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-30mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
+	#now for the 50mers
+	temp=readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[1])-30mers.bcalm.fa`);
+	Y50 = pmap(x->int(readall(`$(query_per_sequence_binary) $(basename(input_file_name))-50mers.jf $(data_dir)/Bcalms/$(file_names[x])-30mers.bcalm.fa`)),[1:num_files]);
+	y30 = Y30/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-30mers.jf`))[6]); #divide by total number of kmers in sample
+	y50 = Y50/float(split(readall(`$(jellyfish_binary) stats $(basename(input_file_name))-50mers.jf`))[6]); #divide by total number of kmers in sample
+	if save_y
+		fid = open("$(dirname(output_file))/$(basename(input_file_name))-y30.txt","w")
+		for i=1:length(y30)
+			write(fid,"$(y30[i])\n")
+		end
+		close(fid)
+		fid = open("$(dirname(output_file))/$(basename(input_file_name))-y50.txt","w")
+		for i=1:length(y50)
+			write(fid,"$(y50[i])\n")
+		end
+		close(fid)
+	end
+end
 
 #Make the hypothetical matrices (later, only do this for the basis elements)
 #30mers
@@ -469,6 +501,11 @@ blas_set_num_threads(length(workers()))
 
 #Perform the classification, just lsqnonneg, reduce basis
 basis=find(y30.>.0001);
+if basis==[]
+	rm("$(basename(input_file_name))-30mers.jf")
+	rm("$(basename(input_file_name))-50mers.jf")
+	error("No organisms detected. Most likely the input file doesn't have enough sequences")
+end
 y = float(vcat(y30[basis],y50[basis]));
 column_basis=int64(vcat(basis,[basis[j].+i*num_files for i=1:length(thresholds), j=1:length(basis)]'[:])); #this is the basis expanded to include the hypothetical organisms
 xtemp=lsqnonneg(A_with_hypothetical[vcat(basis,basis.+num_files),column_basis],y,.0005,3,.000001); #Added change in x term
@@ -481,7 +518,9 @@ for i=1:length(xtemp)
 end
 
 #Normalize the result
-x=x/sum(x);
+if normalize | (sum(x)>1)
+	x=x/sum(x);
+end
 
 #Write x_file
 fid = open(x_file,"w")
@@ -504,8 +543,12 @@ end
 
 #Clean up the files
 rm(x_file)
-rm("$(basename(input_file_name))-30mers.jf")
-rm("$(basename(input_file_name))-50mers.jf")
+if isfile("$(basename(input_file_name))-30mers.jf")
+	rm("$(basename(input_file_name))-30mers.jf")
+end
+if isfile("$(basename(input_file_name))-50mers.jf")
+	rm("$(basename(input_file_name))-50mers.jf")
+end
 
 
 

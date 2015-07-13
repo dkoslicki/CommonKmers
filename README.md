@@ -37,10 +37,15 @@ docker build -t username/imagename .
 To classify a sample using the Julia version, use the ``ClassifyFull.jl`` command located in ``CommonKmers/src/Julia``. An example of running the program in the sensitive mode using 48 threads and a minimum quality score (for kmers to be counted) of C (phred33 ascii code 35) is given by
 
 ```julia
-julia -p 48 Classify.jl -d /path/to/CommonKmersData/ -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence
+julia -p 48 Classify.jl -d /path/to/CommonKmersData/ -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence --normalize
 ```
 
 Only FASTQ files are acceptable input.
+
+The optional flag ``--save_y`` will save the normalized common kmer counts into a file called ``/path/to/ouput/file.fastq-y30.txt``. After running the script with this flag, the script can then be re-run using the optional flag ``--re_run`` with a different ``--kind`` specified (as this will significantly speed up the process).
+
+The optional flag ``--normalize`` will normalize the output profile to sum to 1 (so it will appear that 100% of the sample has been classified). This is similar to the default options of MetAPhlAn.
+
 
 ####Using Docker####
 To run the tool from docker, mount the appropriate folders and run using the following command:
