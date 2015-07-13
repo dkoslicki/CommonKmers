@@ -29,7 +29,7 @@ do
 	gunzip -c -d $file > /tmp/input.fq
 	cd /tmp
 	#Run common kmers, using default quality score of C (phred33 code 35) unless otherwise set by the user
-	julia -p ${DCKR_THREADS} /usr/local/sbin/ClassifyFull.jl -j /jellyfish/jellyfish-2.2.0/bin/./jellyfish -i /tmp/input.fq -Q ${QUALITY:=C} -d ${CONT_DATABASES_DIR}/CommonKmersData -k default -o ${CONT_PROFILING_FILES}/${file}.profile
+	julia -p ${DCKR_THREADS} /usr/local/sbin/ClassifyFull.jl -j /jellyfish/jellyfish-2.2.0/bin/./jellyfish -i /tmp/input.fq -Q ${QUALITY:=C} -d ${CONT_DATABASES_DIR}/CommonKmersData -k default -o ${CONT_PROFILING_FILES}/${file}.profile --normalize
 	cd /dckr/mnt/input
 done
 
