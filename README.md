@@ -50,7 +50,12 @@ A Dockerfile is included in this repository. See the [Docker homepage](https://w
 
 You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
 
-You can build the docker image by cloning the repository, starting Docker, and then in the ``CommonKmers/Docker`` folder, using the command:
+You can either pull the docker image from DockerHub using
+```bash
+docker pull dkoslicki/commonkmers
+```
+
+Or you can build the docker image from the Dockerfile by cloning the repository, starting Docker, and then in the ``CommonKmers/Docker`` folder, using the command:
 ```bash 
 docker build -t username/imagename .
 ```
