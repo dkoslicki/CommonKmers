@@ -9,7 +9,16 @@ CommonKmers is a k-mer based bacterial community reconstruction technique that u
 
 ## How Do I Install CommonKmers? ##
 ###Build from source###
-You will need the Kmer counting tool Jellyfish to be installed. Please see [the Jellyfish installation page](http://www.genome.umd.edu/jellyfish.html) for installation directions.
+You will need the Kmer counting tool Jellyfish to be installed. Please see [the Jellyfish installation page](http://www.genome.umd.edu/jellyfish.html) for installation directions. Briefly, this can be installed using:
+
+```bash
+wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.3/jellyfish-2.2.3.tar.gz
+tar -xf jellyfish-2.2.3.tar.gz
+cd jellyfish-2.2.3
+./configure
+make
+```
+The binary will then be located in ``jellyfish-2.2.3/bin/``.
 
 You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
 
@@ -18,7 +27,7 @@ You will need to add the HDF5 and ArgParse packages. These can be added using `P
 
 You will also need to compile the ``query_per_sequence`` code using a command such as:
 ```bash
-g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.0/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.0/.libs query_per_sequence.cc sequence_mers.hpp -o query_per_sequence
+g++ -I /jellyfish/jellyfish-2.2.3/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.3/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.3/.libs query_per_sequence.cc sequence_mers.hpp -o query_per_sequence
 ```
 
 ###Using Docker###
@@ -113,7 +122,7 @@ For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_ta
 The ``/CommonKmers/src/CountInFile/count_in_file.cc`` code can be compiled using a command like:
 
 ```bash
-g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.0/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.0/.libs count_in_file.cc -o count_in_file
+g++ -I /jellyfish/jellyfish-2.2.3/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.3/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.3/.libs count_in_file.cc -o count_in_file
 ```
 
 ####Run the script ``Train.jl``####

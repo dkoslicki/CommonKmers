@@ -9,10 +9,10 @@ RUN apt-get -y update && \
  apt-get install -y wget && \ 
  mkdir jellyfish && \ 
  cd jellyfish && \ 
- wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.0/jellyfish-2.2.0.tar.gz && tar -xzf jellyfish-2.2.0.tar.gz && \
+ wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.3/jellyfish-2.2.3.tar.gz && tar -xzf jellyfish-2.2.3.tar.gz && \
  apt-get install -y g++ && \ 
  apt-get install -y build-essential  && \ 
- cd /jellyfish/jellyfish-2.2.0/ && \ 
+ cd /jellyfish/jellyfish-2.2.3/ && \ 
  ./configure && \ 
  make
 
@@ -29,9 +29,9 @@ RUN apt-get install -y julia && \
 RUN apt-get install -y git && \
  git clone https://github.com/dkoslicki/CommonKmers.git && \
  cd /CommonKmers/src/QueryPerSeq/ && \
- g++ -I /jellyfish/jellyfish-2.2.0/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.0/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.0/.libs query_per_sequence.cc sequence_mers.hpp -o query_per_sequence && \
+ g++ -I /jellyfish/jellyfish-2.2.3/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.3/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.3/.libs query_per_sequence.cc sequence_mers.hpp -o query_per_sequence && \
  cp /CommonKmers/src/QueryPerSeq/query_per_sequence /usr/local/bin && \
- cp /CommonKmers/src/Julia/ClassifyFull.jl /usr/local/sbin/ClassifyFull.jl
+ cp /CommonKmers/src/Julia/Classify.jl /usr/local/sbin/Classify.jl
 
 #Install gzip
 RUN apt-get install -y gzip
