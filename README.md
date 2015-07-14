@@ -20,10 +20,25 @@ make
 ```
 The binary will then be located in ``jellyfish-2.2.3/bin/``.
 
-You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
+You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data. This can be accomplished with:
+
+```bash
+	curl http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz > CommonKmersData.tar.gz
+	tar -xf CommonKmersData.tar.gz
+```
 
 Please refer to [the Julia installation page](http://julialang.org/downloads/) to install Julia.
-You will need to add the HDF5 and ArgParse packages. These can be added using `Pkg.add("HDF5")` and `Pkg.add("ArgParse")`.
+You will need to add the HDF5 and ArgParse packages. These can be added using `Pkg.add("HDF5")` and `Pkg.add("ArgParse")`. In Ubuntu, this can be accomplished with something like:
+
+```bash
+apt-get install -y software-properties-common python-software-properties
+add-apt-repository -y ppa:staticfloat/juliareleases
+add-apt-repository -y ppa:staticfloat/julia-deps
+apt-get -y update || echo "ok" 
+apt-get install -y julia
+apt-get install -y hdf5-tools
+julia -e 'Pkg.add("HDF5"); Pkg.add("ArgParse");'
+```
 
 You will also need to compile the ``query_per_sequence`` code using a command such as:
 ```bash
