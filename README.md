@@ -42,7 +42,7 @@ You will also need to compile the ``query_per_sequence`` code using a command su
 g++ -I /jellyfish/jellyfish-2.2.3/include -std=c++0x -Wall -O3 -L /jellyfish/jellyfish-2.2.3/.libs -l jellyfish-2.0 -l pthread -Wl,--rpath=/jellyfish/jellyfish-2.2.3/.libs query_per_sequence.cc sequence_mers.hpp -o query_per_sequence
 ```
 
-###Using Docker###
+###Or Use Docker###
 A Dockerfile is included in this repository. See the [Docker homepage](https://www.docker.com/) for more information.
 
 You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data.
