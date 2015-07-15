@@ -1,7 +1,4 @@
 # CommonKmers #
-This is a work in progress, and not yet ready for use.
-
-This is the source code for CommonKmers.
 
 ## What is CommonKmers? ##
 CommonKmers is a k-mer based bacterial community reconstruction technique that utilizes sparsity promoting ideas from the field of compressed sensing to reconstruct the composition of a bacterial community. This method allows for strain-level abundance estimation, and can quantify the evolutionary distance between organisms in the sample and in the training database (thereby allowing for successful classification even with incomplete training data).
