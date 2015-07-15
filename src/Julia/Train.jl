@@ -110,8 +110,33 @@ end
 pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 30 -t 1 -s 100M -C -o $(output_folder)/Counts/$(file_names[x])-30mers.jf`),[1:num_files],workers_to_use);
 pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 50 -t 1 -s 100M -C -o $(output_folder)/Counts/$(file_names[x])-50mers.jf`),[1:num_files],workers_to_use);
 
+#Temporary function that performs the parallelization
+function to_run(index_list,CommonKmersMatrix,kmer_size)
+	np = nprocs()  # determine the number of processes available
+	n = size(index_list,1)
+	i = 1
+	# function to produce the next work item from the queue.
+	# in this case it's just an index.
+	nextidx() = (idx=i; i+=1; idx)
+	@sync begin
+		for p=1:np
+			if p != myid() || np == 1
+				@async begin
+					while true
+						idx = nextidx()
+						if idx > n
+							break
+						end
+						(CommonKmersMatrix[index_list[idx,1],index_list[idx,2]],CommonKmersMatrix[index_list[idx,2],index_list[idx,1]]) = remotecall_fetch(p, (x,y)->int64(split(readall(`$(count_in_file_binary) $(output_folder)/Counts/$(file_names[x])-$(kmer_size)mers.jf $(output_folder)/Counts/$(file_names[y])-$(kmer_size)mers.jf`))), index_list[idx,1],index_list[idx,2])
+					end
+				end
+			end
+		end
+	end
+end
+
+
 #Form the CommonKmer matrix
-#This will need to be refined after moving to count_in_file. Specifically, we should go row by row, and parallelize over columns. Due to the @sync, given a slow row, this can severely slow down the whole process
 for kmer_size=[30;50]
 	CommonKmersMatrix = SharedArray(Int64, (num_files,num_files), init=0);
 	for j = 1:chunk_size:num_files
@@ -120,22 +145,23 @@ for kmer_size=[30;50]
 			if i>=j
 				#tic()
 				#print("On (row,column) chunk: ($(i),$(j)) of $(num_files)\n")
-				#parallelize over the chunk
-				@sync begin
-				@parallel for ii = i:i+chunk_size-1
+				#Get the chunk indicies
+				index_list = Int64[];
+				for ii = i:i+chunk_size-1
 					if ii<=num_files
-						ikmers = "$(output_folder)/Counts/$(file_names[ii])-$(kmer_size)mers.jf"
 						for jj=j:j+chunk_size-1
 							if jj<=num_files
-								jkmers = "$(output_folder)/Counts/$(file_names[jj])-$(kmer_size)mers.jf"
-								(CommonKmersMatrix[ii,jj],CommonKmersMatrix[jj,ii]) = int64(split(readall(`$(count_in_file_binary) $(ikmers) $(jkmers)`)));
+								if isempty(index_list)
+									index_list = [ii jj];
+								else
+									index_list = vcat(index_list,[ii jj]);
+								end
 							end
 						end
 					end
 				end
-				end
-				#toc()
-				gc()
+				#Parallelize over the chunk
+				to_run(index_list,CommonKmersMatrix,kmer_size)
 			end
 		end
 	end
