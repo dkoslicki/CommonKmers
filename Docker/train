@@ -2,22 +2,22 @@
 # . "$DCKR_TASKS"/mytask1
 #echo 'Default task is empty' 1>&2
 #check if list of input files exist
-if [ ! -f "$CONT_FASTQ_FILE_LISTING" ]
+if [ ! -f "$CONT_CONTIGS_FILE_LISTING" ]
 then
-	echo "List of input files not given. Please include a list of input files at: $CONT_FASTQ_FILE_LISTING" 1>&2
+	echo "List of input files not given. Please include a list of input files at: $CONT_CONTIGS_FILE_LISTING" 1>&2
 	exit 0
 fi
 
 #check if Data folder is present
-if [ ! -d ${CONT_DATABASES_DIR}/Sequences ]
+if [ ! -d /dckr/mnt/input ]
 then
-	echo "Data directory missing. Hint, include the following command when starting docker: -v /path/to/local/Data:${CONT_DATABASES_DIR}/Sequences:ro" 1>&2
+	echo "Data directory missing. Hint, include the following command when starting docker: -v /path/to/local/Data:/dckr/mnt/input:ro" 1>&2
 	exit 0
 fi
 
 #Create file of full names of sequences
 cd /tmp
-cat $CONT_FASTQ_FILE_LISTING | xargs -I{} sh -c "echo ${CONT_DATABASES_DIR}/Sequences/{} >> /tmp/FileNames.txt"
+cat $CONT_CONTIGS_FILE_LISTING | xargs -I{} sh -c "echo /dckr/mnt/input/{} >> /tmp/FileNames.txt"
 
 #Create RAM disk for bcalm
 mkdir /ramdisk
