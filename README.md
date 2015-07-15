@@ -109,6 +109,8 @@ If you wish to use a custom training database, the following steps must be perfo
 4. Compile the code contained in ``CommonKmers/src/CountInFile/``.
 5. Run the script ``Train.jl``.
 
+Alternatively, you can use Docker (though an acceptable taxonomy still needs to be created).
+
 ####Creating custom taxonomy####
 For each genome in ``FileNames.txt`` (and in the same order), a taxonomy file must be created. This file MUST be a newline delimitated file with each line having the following format:
 ```bash
@@ -165,6 +167,16 @@ sudo umount -v /tmp/ramdisk
 ```
 
 Note that the time required to complete the training step can be considerable (depending on hardware available). Using 48 cores and 256GB of RAM, training on ~7,000 genomes can take upwards of a week.
+
+####Using Docker####
+
+Alternatively, after creating the acceptable taxonomy, Docker can be used to form the training data. You will need to have access to a folder containing all the uncompressed training fasta/fastq files. You will also need to create a file (name it ``sample.fna.list``) that contains all the base names of the training fasta/fastq files, and put this in the same folder.
+
+Docker can then be called with
+```bash
+docker run --rm --privileged -e "DCKR_THREADS=48"  -e "RAM_DISK_SIZE=100G" -v /path/to/input/data:/dckr/mnt/input:ro -v /path/to/output/folder:/dckr/mnt/output:rw -t username/imagename train
+```
+The flag ``--privileged`` is required since docker will then be allowed to automatically create the RAM disk. Note the default RAM disk size is 10G (I suggest using around half the available RAM).
 
 ####Run the ``Classify.jl`` script####
 You can now run the ``Classify.jl`` script as before, but this time utilizing the directory ``CommonKmerTrainingData`` for the option ``-d``.

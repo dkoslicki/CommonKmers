@@ -22,7 +22,7 @@ cat $CONT_CONTIGS_FILE_LISTING | xargs -I{} sh -c "echo /dckr/mnt/input/{} >> /t
 #Create RAM disk for bcalm
 mkdir /ramdisk
 chmod 777 /ramdisk
-mount -t tmpfs -o size=10G tmpfs /ramdisk/
+mount -t tmpfs -o size=${RAM_DISK_SIZE:=10G} tmpfs /ramdisk/
 
 #Run common kmers, using default quality score of C (phred33 code 35) unless otherwise set by the user
 julia -p ${DCKR_THREADS} /usr/local/sbin/Train.jl -i /tmp/FileNames.txt -o ${CONT_PROFILING_FILES} -b /usr/local/bin/./bcalm -r /ramdisk/ -j /jellyfish/jellyfish-2.2.3/bin/./jellyfish -c /usr/local/bin/./count_in_file
