@@ -66,7 +66,7 @@ To classify a sample using the Julia version, use the ``ClassifyFull.jl`` comman
 julia -p 48 Classify.jl -d /path/to/CommonKmersData/ -o /path/to/output/file.profile -i /path/to/input/file.fastq -Q C -k sensitive -j /path/to/./jellyfish -q /path/to/./query_per_sequence --normalize
 ```
 
-Only FASTQ files are acceptable input.
+FASTQ and FASTA files are acceptable input. Note that if FASTA files are used, no error correction will be done (which can lead to poor results).
 
 The optional flag ``--save_y`` will save the normalized common kmer counts into a file called ``/path/to/ouput/file.fastq-y30.txt``. After running the script with this flag, the script can then be re-run using the optional flag ``--re_run`` with a different ``--kind`` specified (this will significantly speed this and any other subsequent runs). Note that if you change the quality score ``-Q``, you must ``--save_y`` before you can use the ``--re_run`` flag again.
 
@@ -78,7 +78,7 @@ To run the tool from docker, mount the appropriate folders and run using the fol
 ```bash
 docker run --rm -e "QUALITY=C" -e "DCKR_THREADS=48" -v /path/to/CommonKmersData:/dckr/mnt/camiref/CommonKmersData:ro -v /path/to/Output:/dckr/mnt/output:rw -v /path/to/Input:/dckr/mnt/input:ro -t username/imagename [type]
 ```
-In the input folder must be a collection of gzipped FASTQ (not FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
+In the input folder must be a collection of gzipped FASTQ (or FASTA) files, as well as a file (called ``sample.fq.gz.list`` (given by the docker image environmental variable ``$CONT_FASTQ_FILE_LISTING``) listing the files on which to run the tool.
 Here ``[type]`` is one of ``default, sensitive, specific``.
 The ``--rm`` flag deletes temporary files after exit (otherwise they might persist in ``/var/lib/docker/volumes`` or the like).
 If the environmental variable ``QUALITY`` is not passed to docker (via ``-e QUALITY=<ascii character>``), a default value of "C" will be used. 
