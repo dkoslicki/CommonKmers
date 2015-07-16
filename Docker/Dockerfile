@@ -38,8 +38,9 @@ RUN apt-get install -y git && \
  cp /CommonKmers/src/CountInFile/count_in_file /usr/local/bin
  
 #Install Bcalm
-RUN git clone https://github.com/Malfoy/bcalm.git && \
- cd bcalm && \
+RUN wget https://github.com/Malfoy/bcalm/archive/1.tar.gz && \
+ tar -zxf 1.tar.gz && \
+ cd bcalm-1
  make && \
  cp bcalm /usr/local/bin
  
