@@ -103,6 +103,7 @@ The FastX toolbox can be downloaded [here](http://hannonlab.cshl.edu/fastx_toolk
 ## Custom Training Databases ##
 If you wish to use a custom training database, the following steps must be performed:
 
+0. Install Bcalm
 1. Create a directory to contain the training data (called ``CommonKmerTrainingData`` below).
 2. Create an acceptable taxonomy for the training genomes, and place it in the ``CommonKmerTrainingData`` folder.
 3. Create a file consisting of the full paths of the training genomes, and save this to a file (for example, ``FileNames.txt``).
@@ -110,6 +111,17 @@ If you wish to use a custom training database, the following steps must be perfo
 5. Run the script ``Train.jl``.
 
 Alternatively, you can use Docker (though an acceptable taxonomy still needs to be created).
+
+####Install Bcalm####
+To install Bcalm, do something like the following:
+```bash
+wget https://github.com/Malfoy/bcalm/archive/1.tar.gz && \
+ tar -zxf 1.tar.gz && \
+ cd bcalm-1
+ make && \
+ cp bcalm /usr/local/bin
+```
+Note that the [current Bcalm git repository](https://github.com/Malfoy/bcalm) does not compile correctly, so you must install from the release.
 
 ####Creating custom taxonomy####
 For each genome in ``FileNames.txt`` (and in the same order), a taxonomy file must be created. This file MUST be a newline delimitated file with each line having the following format:
