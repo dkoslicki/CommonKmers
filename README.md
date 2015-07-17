@@ -117,7 +117,7 @@ To install Bcalm, do something like the following:
 ```bash
 wget https://github.com/Malfoy/bcalm/archive/1.tar.gz && \
  tar -zxf 1.tar.gz && \
- cd bcalm-1
+ cd bcalm-1 && \
  make && \
  cp bcalm /usr/local/bin
 ```
