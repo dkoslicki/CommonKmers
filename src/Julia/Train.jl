@@ -107,8 +107,8 @@ if length(worker_ids)>jellyfish_threads
 else
 	workers_to_use = worker_ids;
 end
-pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 30 -t 1 -s 100M -C -o $(output_folder)/Counts/$(file_names[x])-30mers.jf`),[1:num_files],workers_to_use);
-pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 50 -t 1 -s 100M -C -o $(output_folder)/Counts/$(file_names[x])-50mers.jf`),[1:num_files],workers_to_use);
+pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 30 -t 1 -s 100M --disk -C -o $(output_folder)/Counts/$(file_names[x])-30mers.jf`),[1:num_files],workers_to_use);
+pmap2(x->run(`$(jellyfish_binary) count $(full_file_names[x]) -m 50 -t 1 -s 100M --disk -C -o $(output_folder)/Counts/$(file_names[x])-50mers.jf`),[1:num_files],workers_to_use);
 
 #Temporary function that performs the parallelization
 function to_run(index_list,CommonKmersMatrix,kmer_size)
