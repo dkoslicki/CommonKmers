@@ -20,8 +20,8 @@ The binary will then be located in ``jellyfish-2.2.3/bin/``.
 You will need to download [this data repository](http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz), and then extract using ``tar -xf CommonKmersData.tar.gz``. This folder contains all the default training data. This can be accomplished with:
 
 ```bash
-	curl http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz > CommonKmersData.tar.gz
-	tar -xf CommonKmersData.tar.gz
+curl http://www.math.oregonstate.edu/~koslickd/CommonKmersData.tar.gz > CommonKmersData.tar.gz
+tar -xf CommonKmersData.tar.gz
 ```
 
 Please refer to [the Julia installation page](http://julialang.org/downloads/) to install Julia.
