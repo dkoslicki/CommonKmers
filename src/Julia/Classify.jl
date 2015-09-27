@@ -387,6 +387,9 @@ function parse_commandline()
 		"--normalize"
 			help = "Normalize the profile to sum to 1"
 			action = :store_true
+		"--save_x"
+			help = "Use this flag to save the output x vector, to be used for various plotting features"
+			action = :store_true
     end
     return parse_args(s)
 end
@@ -402,6 +405,7 @@ end
 @everywhere sample_ID = input_file_name
 @everywhere quality = parsed_args["quality"]
 @everywhere save_y = parsed_args["save_y"]
+@everywhere save_x = parsed_args["save_x"]
 @everywhere re_run = parsed_args["re_run"]
 @everywhere normalize = parsed_args["normalize"]
 
@@ -533,13 +537,19 @@ close(fid)
 A = float(h5read(A30_file,"/common_kmers"))'; 
 A_norm = A./diag(A)';
 
-
 if kind=="default" || kind=="specific" || kind=="sensitive"
 	ConvertToCAMIOutputLCA(kind, x_file, taxonomy_file, classification_file, thresholds, A_norm, sample_ID)
 else
 	error("Must choose one of the following output kinds for -k: default, specific, sensitive")
 end
 
+#Save the x vector for plotting etc
+if save_x
+	fid = open("$(dirname(output_file))/$(basename(input_file_name))-x.txt","w")
+	for i=1:length(x)
+		write(fid,"$(x[i])\n")
+	end
+end
 
 #Clean up the files
 rm(x_file)
