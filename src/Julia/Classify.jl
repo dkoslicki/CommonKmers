@@ -513,6 +513,16 @@ end
 y = float(vcat(y30[basis],y50[basis]));
 column_basis=int64(vcat(basis,[basis[j].+i*num_files for i=1:length(thresholds), j=1:length(basis)]'[:])); #this is the basis expanded to include the hypothetical organisms
 xtemp=lsqnonneg(A_with_hypothetical[vcat(basis,basis.+num_files),column_basis],y,.000005,3,.000001); #Added change in x term
+resid30=norm(A_with_hypothetical30[basis,column_basis]*xtemp-float(y30[basis]),2);
+resid50=norm(A_with_hypothetical50[basis,column_basis]*xtemp-float(y50[basis]),2);
+lambda50=resid50/resid30;
+lambda30=resid30/resid50;
+if lambda50>1
+	xtemp=lsqnonneg(vcat(A_with_hypothetical30[basis,column_basis], lambda50*A_with_hypothetical50[basis,column_basis]),float(vcat(y30[basis],lambda50*y50[basis])),.000005,3,.000001);
+elseif lambda30>1
+	xtemp=lsqnonneg(vcat(lambda30*A_with_hypothetical30[basis,column_basis], A_with_hypothetical50[basis,column_basis]),float(vcat(lambda30*y30[basis],y50[basis])),.000005,3,.000001);
+end
+
 
 #create vector on full basis
 x = zeros(num_files*(length(thresholds)+1));
