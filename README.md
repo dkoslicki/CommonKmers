@@ -70,6 +70,8 @@ FASTQ and FASTA files are acceptable input. Note that if FASTA files are used, n
 
 The optional flag ``--save_y`` will save the normalized common kmer counts into a file called ``/path/to/ouput/file.fastq-y30.txt``. After running the script with this flag, the script can then be re-run using the optional flag ``--re_run`` with a different ``--kind`` specified (this will significantly speed this and any other subsequent runs). Note that if you change the quality score ``-Q``, you must ``--save_y`` before you can use the ``--re_run`` flag again.
 
+The optional flag ``--save_x`` will save the reconstruction to a text file. This is necessary for plotting features.
+
 The optional flag ``--normalize`` will normalize the output profile to sum to 1 (so it will appear that 100% of the sample has been classified). This is similar to the default options of MetAPhlAn.
 
 
