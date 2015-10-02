@@ -147,7 +147,7 @@ An example line is as follows:
 1184607_Austwickia_chelonae_NBRC_105200	1184607	k__2_Bacteria|p__201174_Actinobacteria|c__1760_Actinobacteria|o__2037_Actinomycetales|f__85018_Dermatophilaceae|g__1184606_Austwickia|s__100225_Austwickia_chelonae|t__1184607_Austwickia_chelonae_NBRC_105200
 ```
 
-For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_taxid.py`` generates such a taxonomy using the NCBI taxonomy. This file must be placed in the ``CommonKmerTrainingData`` folder.
+For your convenience, the script ``CommonKmers/src/Taxonomy/generate_taxonomy_taxid.py`` generates such a taxonomy using the NCBI taxonomy. This file must be placed in the ``CommonKmerTrainingData`` folder and MUST be called ``Taxonomy.txt``.
 
 ####Compile the ``count_in_file`` code####
 The ``/CommonKmers/src/CountInFile/count_in_file.cc`` code can be compiled using a command like:

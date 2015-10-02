@@ -111,6 +111,10 @@ def main(argv):
 	phylo.phyloxml_phylogeny.set_name(title)
 	project.add_phylogeny(phylo)
 	project.export(open(out_file_xml,'w'))
+	
+	#Show the tree interactively
+	#t.show(tree_style=ts)
+
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
