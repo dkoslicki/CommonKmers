@@ -141,7 +141,7 @@ For each genome in ``FileNames.txt`` (and in the same order), a taxonomy file mu
 k__<KingdomTaxID>_<KingdomName>|p__<PhylumTaxID>_<PhylumName>|c__<ClassTaxID>_<ClassName>|o__<OrderTaxID>_<OrderName>|f__<FamilyTaxID>_<FamilyName>|g__<GenusTaxID>_<GenusName>|s__<SpeciesTaxID>_<SpeciesName>|t__<StrainTaxID>_<StrainName>
 ```
 
-The taxonomy is only required at the kingdom level, with lower levels being optional.
+The taxonomy is only required at the kingdom level, with lower levels being optional. Missing ranks can be included with ``||``.
 
 An example line is as follows:
 
