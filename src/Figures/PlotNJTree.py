@@ -83,6 +83,7 @@ def main(argv):
 	for i in range(num_rows):
 		matrix.append([.5*(1-.5*ckm30_norm[i,j]-.5*ckm30_norm[j,i])+.5*(1-.5*ckm50_norm[i,j]-.5*ckm50_norm[j,i]) for j in range(i+1)])
 	
+	#Construct the tree. Note I could use RapidNJ here, but a few tests have shown that the trees that RapidNJ creates are rubbish.
 	dm = _DistanceMatrix(names, matrix)
 	constructor = DistanceTreeConstructor()
 	tree = constructor.nj(dm)
