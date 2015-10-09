@@ -19,15 +19,17 @@ def main(argv):
 	out_file=''
 	width=750
 	out_file_xml=''
+	plot_rectangular = False
 	common_kmer_data_path=''
+	taxonomic_names_on_leaves = False
 	try:
-		opts, args = getopt.getopt(argv,"h:i:lno:w:x:D:",["Help=","InputCommonKmerXFile=","LabelLeaves=", "LabelInternalNodes=","OutFile=","Width=","OutFileXML=","CommonKmerDataPath="])
+		opts, args = getopt.getopt(argv,"h:i:lnrto:w:x:D:",["Help=","InputCommonKmerXFile=","LabelLeaves=", "LabelInternalNodes=","Rectangular=", "TaxonomicNamesOnLeaves=", "OutFile=","Width=","OutFileXML=","CommonKmerDataPath="])
 	except getopt.GetoptError:
-		print 'Unknown option, call using: ./PlotNJTree.py -i <InputCommonKmerXFile> -D <CommonKmerDataPath> -l <LabelLeavesFlag> -n <LabelInternalNodesFlag> -o <OutFile.png> -x <Outfile.xml> -w <Width>'
+		print 'Unknown option, call using: ./PlotNJTree.py -i <InputCommonKmerXFile> -D <CommonKmerDataPath> -l <LabelLeavesFlag> -n <LabelInternalNodesFlag> -r <RectangularPlotFlag> -t <TaxonomicNamesOnLeavesFlag> -o <OutFile.png> -x <Outfile.xml> -w <Width>'
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print './PlotNJTree.py -i <InputCommonKmerXFile> -D <CommonKmerDataPath> -l <LabelLeavesFlag> -n <LabelInternalNodesFlag> -o <OutFile.png> -x <Outfile.xml> -w <Width>'
+			print './PlotNJTree.py -i <InputCommonKmerXFile> -D <CommonKmerDataPath> -l <LabelLeavesFlag> -n <LabelInternalNodesFlag> -r <RectangularPlotFlag> -t <TaxonomicNamesOnLeavesFlag> -o <OutFile.png> -x <Outfile.xml> -w <Width>'
 			sys.exit(2)
 		elif opt in ("-i", "--InputCommonKmerXFile"):
 			input_file = arg
@@ -43,6 +45,10 @@ def main(argv):
 			out_file_xml = arg
 		elif opt in ("-D", "--CommonKmerDataPath"):
 			common_kmer_data_path = arg
+		elif opt in ("-r", "--Rectangular"):
+			plot_rectangular = True
+		elif opt in ("-t", "--TaxonomicNamesOnLeaves"):
+			taxonomic_names_on_leaves = True
 	
 	
 	#Read in the x vector
@@ -57,14 +63,14 @@ def main(argv):
 	taxonomy = list()
 	fid = open(os.path.join(common_kmer_data_path,"Taxonomy.txt"),'r')
 	for line in fid:
-		taxonomy.append('_'.join(line.split()[0].split("_")[1:]))
+		taxonomy.append('_'.join(line.split()[0].split("_")[1:])) #Just take the first line of the taxonomy (erasing the taxID)
 	fid.close()
 	
 	#Read in the basis for the ckm matrices
 	x_file_names = list()
 	fid = open(os.path.join(common_kmer_data_path,"FileNames.txt"),'r')
 	for line in fid:
-		x_file_names.append(''.join(line.strip().split(".")[0:-1]))
+		x_file_names.append(os.path.basename(line.strip()))
 	fid.close()
 	
 	#Read in the common kmer matrix
@@ -116,6 +122,7 @@ def main(argv):
 		insert_node(t, leaf_name+"_"+str(percent), child_node.name, percent_dist-t.get_distance(t.name, ancestor_node))
 	
 	#Insert hypothetical nodes
+	hyp_node_names = dict()
 	cutoffs = [.9,.8,.7,.6,.5,.4,.3,.2,.1]
 	cutoffs = map(lambda y: y**1.5,cutoffs)
 	for i in range(len(x_file_names)):
@@ -123,6 +130,7 @@ def main(argv):
 		for j in range(1,len(cutoffs)+1):
 			if xi[j]>0:
 				insert_hyp_node(t, x_file_names[i], cutoffs[j-1])
+				hyp_node_names[x_file_names[i]+"_"+str(cutoffs[j-1])] = [x_file_names[i], cutoffs[j-1], j-1] #in case there are "_" in the file names
 				#insert_hyp_node(t, x_file_names[i],.5/t.get_distance(t.name,t&x_file_names[i])*cutoffs[j])
 	
 	#Now put the bubbles on the nodes
@@ -136,13 +144,17 @@ def main(argv):
 				F.border.width = None
 				F.opacity = 0.6
 				faces.add_face_to_node(F,node, 0, position="branch-right")
-				nameFace = AttrFace("name", fsize=25, fgcolor='black',text_suffix="_"+taxonomy[x_file_names.index(node.name)])
-				faces.add_face_to_node(nameFace, node, 0, position="branch-right")
-		elif len(node.name.split("_"))>1: #Otherwise it's a hypothetical node, just use recon x
-			node_base_name = ''.join(node.name.split("_")[0:-1])
-			percent = float(node.name.split("_")[-1])
+				if taxonomic_names_on_leaves:
+					nameFace = AttrFace("name", fsize=25, fgcolor='black',text_suffix="_"+taxonomy[x_file_names.index(node.name)])
+					faces.add_face_to_node(nameFace, node, 0, position="branch-right")
+				else:
+					nameFace = AttrFace("name", fsize=25, fgcolor='black')
+					faces.add_face_to_node(nameFace, node, 0, position="branch-right")
+		elif node.name in hyp_node_names: #Otherwise it's a hypothetical node, just use recon x
+			node_base_name = hyp_node_names[node.name][0]
+			percent = hyp_node_names[node.name][1]
 			if node_base_name in x_file_names:
-				val, idx = min((val, idx) for (idx, val) in enumerate([abs(i-percent) for i in cutoffs]))
+				idx = hyp_node_names[node.name][2]
 				size = x[x_file_names.index(node_base_name)+(idx+1)*len(x_file_names)]
 				F = CircleFace(radius=500*math.sqrt(size), color="RoyalBlue", style="sphere")
 				F.border.width = None
@@ -158,7 +170,10 @@ def main(argv):
 	
 	ts = TreeStyle()
 	ts.layout_fn = layout
-	ts.mode = "c"
+	if plot_rectangular:
+		ts.mode = "r"
+	else:
+		ts.mode = "c"
 	ts.show_leaf_name = False
 	ts.min_leaf_separation = 50
 
