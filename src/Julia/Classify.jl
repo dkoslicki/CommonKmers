@@ -543,16 +543,6 @@ for i=1:length(x)
 end
 close(fid)
 
-#Convert to CAMI format, use 30mer matrix to do the LCA
-A = float(h5read(A30_file,"/common_kmers"))'; 
-A_norm = A./diag(A)';
-
-if kind=="default" || kind=="specific" || kind=="sensitive"
-	ConvertToCAMIOutputLCA(kind, x_file, taxonomy_file, classification_file, thresholds, A_norm, sample_ID)
-else
-	error("Must choose one of the following output kinds for -k: default, specific, sensitive")
-end
-
 #Save the x vector for plotting etc
 if save_x
 	fid = open("$(dirname(output_file))/$(basename(input_file_name))-x.txt","w")
@@ -568,6 +558,16 @@ if isfile("$(basename(input_file_name))-30mers.jf")
 end
 if isfile("$(basename(input_file_name))-50mers.jf")
 	rm("$(basename(input_file_name))-50mers.jf")
+end
+
+#Convert to CAMI format, use 30mer matrix to do the LCA
+A = float(h5read(A30_file,"/common_kmers"))'; 
+A_norm = A./diag(A)';
+
+if kind=="default" || kind=="specific" || kind=="sensitive"
+	ConvertToCAMIOutputLCA(kind, x_file, taxonomy_file, classification_file, thresholds, A_norm, sample_ID)
+else
+	error("Must choose one of the following output kinds for -k: default, specific, sensitive")
 end
 
 
