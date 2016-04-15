@@ -552,7 +552,6 @@ if save_x
 end
 
 #Clean up the files
-rm(x_file)
 if isfile("$(basename(input_file_name))-30mers.jf")
 	rm("$(basename(input_file_name))-30mers.jf")
 end
@@ -569,6 +568,8 @@ if kind=="default" || kind=="specific" || kind=="sensitive"
 else
 	error("Must choose one of the following output kinds for -k: default, specific, sensitive")
 end
+
+rm(x_file)
 
 
 
