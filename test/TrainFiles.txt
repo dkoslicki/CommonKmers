@@ -1,0 +1,5 @@
+/nfs1/Koslicki_Lab/koslickd/Repositories/CommonKmers/test/G001281285.fna
+/nfs1/Koslicki_Lab/koslickd/Repositories/CommonKmers/test/G000014725.fna
+/nfs1/Koslicki_Lab/koslickd/Repositories/CommonKmers/test/G000163755.fna
+/nfs1/Koslicki_Lab/koslickd/Repositories/CommonKmers/test/G001076295.fna
+/nfs1/Koslicki_Lab/koslickd/Repositories/CommonKmers/test/G000775715.fna
